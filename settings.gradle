@@ -10,6 +10,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url 'https://android.aldebaran.com/sdk/maven'
+        }
     }
 }
 rootProject.name = "RobotInteractionExperiment"
