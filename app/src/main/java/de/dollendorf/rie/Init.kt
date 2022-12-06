@@ -19,6 +19,7 @@ class Init(private val qiContext: QiContext) {
         if (ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(mainActivity, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE), 100)
         }
+        mainActivity.setConfig(Config("RIE/config.json").loadConfig())
         mainActivity.setBaseFrame(baseFrame)
         mainActivity.setSpeech(Speech(qiContext, Locale(Language.GERMAN, Region.GERMANY)))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))

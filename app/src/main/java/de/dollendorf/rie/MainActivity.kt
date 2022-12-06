@@ -12,12 +12,14 @@ import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
 import com.aldebaran.qi.sdk.builder.TransformBuilder
 import com.aldebaran.qi.sdk.design.activity.RobotActivity
+import kotlinx.serialization.json.*
 
 class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var initClass: Init
     private lateinit var baseFrame: FreeFrame
     private lateinit var lookAt: LookAtTarget
     private lateinit var speech: Speech
+    private lateinit var config: JsonElement
     private var init = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,5 +61,9 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
     fun setLookAt(lookAt: LookAtTarget) {
         this.lookAt = lookAt
+    }
+
+    fun setConfig(config: JsonElement) {
+        this.config = config
     }
 }
