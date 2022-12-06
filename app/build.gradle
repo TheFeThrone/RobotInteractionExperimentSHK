@@ -41,6 +41,8 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
-	implementation 'com.aldebaran:qisdk:1.7.5'
+	implementation 'androidx.activity:activity:1.6.1'
+    implementation 'androidx.fragment:fragment:1.5.4'
+    implementation 'com.aldebaran:qisdk:1.7.5'
 	implementation 'com.aldebaran:qisdk-design:1.7.5'
 }
