@@ -1,31 +1,22 @@
 package de.dollendorf.rie
 
-import android.os.Environment
-import java.io.File
-import java.nio.charset.Charset
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
+import java.io.FileNotFoundException
 
-class Config(private val path: String) {
+class Config(path: String) : JsonHandler(path) {
 
-    private val configFile = File(Environment.getExternalStorageDirectory(), path)
-    private lateinit var config: JsonElement
-
-    fun loadConfig(): JsonElement {
-        if (configFile.isFile) {
-            config = Json.parseToJsonElement(configFile.readText(Charset.defaultCharset()))
-        } else {
+    fun loadConfig(){
+        try {
+            super.loadData()
+        }
+        catch (e: FileNotFoundException) {
+            println("Loading default values.")
             loadDefaults()
         }
-        return config
     }
 
     private fun loadDefaults() {
-        config = Json.parseToJsonElement("""{}""")
-        if (!configFile.exists()) {
-            File(configFile.path.dropLast(12)).mkdirs()
-            configFile.createNewFile()
-        }
-        configFile.writeText(config.toString())
+        val config = Json.parseToJsonElement("""{"experiment": "experiment.json"}""")
+        super.writeData(config.toString())
     }
 }

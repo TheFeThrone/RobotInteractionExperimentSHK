@@ -1,0 +1,18 @@
+{
+"experiment": {
+	"name": "Test"
+	},
+"sequence": {
+	"order": "step1",
+	"step1": {
+		"order": "look_at,time1,say",
+		"look_at_1": {
+			"x": 5.0,
+			"y": 10.0,
+			"z": 3.0
+			},
+		"time1": 10.0,
+		"say": "Hallo, ich bin Pepper."
+		}
+	}
+}
