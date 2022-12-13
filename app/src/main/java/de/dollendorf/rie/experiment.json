@@ -3,16 +3,16 @@
 	"name": "Test"
 	},
 "sequence": {
-	"order": "step1",
-	"step1": {
-		"order": "look_at,time1,say",
+	"order": "step_1",
+	"step_1": {
+		"order": "look_at_1,time_1,say_1",
 		"look_at_1": {
 			"x": 5.0,
 			"y": 10.0,
 			"z": 3.0
 			},
-		"time1": 10.0,
-		"say": "Hallo, ich bin Pepper."
+		"time_1": 10000,
+		"say_1": "Hallo, ich bin Pepper."
 		}
 	}
 }

@@ -41,6 +41,8 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
                 setContentView(R.layout.activity_main)
             }
             init = true
+            val experimentHandler = ExperimentHandler(experiment, lookAt, speech)
+            experimentHandler.start()
         } else {
             resume()
         }
