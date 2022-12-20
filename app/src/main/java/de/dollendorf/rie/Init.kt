@@ -29,7 +29,7 @@ class Init(private val qiContext: QiContext) {
             mainActivity.setExperiment(experiment)
         }
         mainActivity.setBaseFrame(baseFrame)
-        mainActivity.setSpeech(Speech(qiContext, Locale(Language.GERMAN, Region.GERMANY)))
+        mainActivity.setSpeech(Speech(qiContext, Locale(Language.ENGLISH, Region.UNITED_STATES)))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
     }
 }
