@@ -8,6 +8,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
 
     private var steps: List<String>? = null
     private var lookAtFuture: Future<Void>? = null
+    private var currentStep: String? = null
 
     override fun run() {
         startExperiment()
@@ -25,6 +26,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
         val items = experiment.getElement("$step/order")?.split(",")
         println(items)
         for (item in items!!) {
+            currentStep = item
             when (item.substringBeforeLast("_")) {
                 "look_at" -> {
                     val x = Double.valueOf(experiment.getElement("$step/$item/x")!!)
@@ -53,6 +55,10 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
 
     fun cancelMovements() {
         lookAtFuture?.requestCancellation()
+    }
+
+    fun getCurrentStep(): String? {
+        return currentStep
     }
 
 }

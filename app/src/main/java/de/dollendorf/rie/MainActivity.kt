@@ -1,14 +1,11 @@
 package de.dollendorf.rie
 
-import android.R.attr.text
-import android.R.attr.value
 import android.os.Bundle
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.aldebaran.qi.sdk.`object`.actuation.FreeFrame
 import com.aldebaran.qi.sdk.design.activity.RobotActivity
-import kotlinx.serialization.json.*
 
 
 class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
@@ -43,6 +40,8 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             init = true
             val experimentHandler = ExperimentHandler(experiment, lookAt, speech)
             experimentHandler.start()
+            val webInterface = Webinterface(8080)
+            webInterface.startServer(assets, experimentHandler)
         } else {
             resume()
         }
