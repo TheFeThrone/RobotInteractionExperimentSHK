@@ -3,7 +3,7 @@ package de.dollendorf.rie
 import kotlinx.serialization.json.Json
 import java.io.FileNotFoundException
 
-class Config(path: String) : JsonHandler(path) {
+class Config(path: String) : JsonLoader(path) {
 
     fun loadConfig(){
         try {

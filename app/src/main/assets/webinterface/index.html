@@ -3,12 +3,18 @@
 <head>
     <meta charset="utf-8">
     <title>Pepper Webinterface</title>
+    <link rel="stylesheet" href="/css/style.css" type="text/css">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 </head>
 <body>
-<div id="app">
-    <p v-text="currentState"></p>
-</div>
-<script src="/myBlog.js"></script>
+    <div class="topnav">
+        <a class="active" href="#">Home</a>
+        <a href="experiment.html">Experiment</a>
+        <a href="configuration.html">Configuration</a>
+    </div>
+    <div id="app">
+        <parent v-bind:connection="connection" v-bind:steps="steps" v-bind:current-state="currentState"></parent>
+    </div>
+    <script src="/js/vue.js"></script>
 </body>
 </html>

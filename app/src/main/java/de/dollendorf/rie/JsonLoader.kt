@@ -8,7 +8,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.nio.charset.Charset
 
-open class JsonHandler(path: String) {
+open class JsonLoader(path: String) {
 
     private val file = File("${Environment.getExternalStorageDirectory()}/RIE/$path")
     private lateinit var items: JsonElement

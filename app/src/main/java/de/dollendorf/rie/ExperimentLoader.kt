@@ -2,7 +2,7 @@ package de.dollendorf.rie
 
 import java.io.FileNotFoundException
 
-class ExperimentLoader(path: String) : JsonHandler(path) {
+class ExperimentLoader(path: String) : JsonLoader(path) {
 
     fun loadExperiment() {
         try {

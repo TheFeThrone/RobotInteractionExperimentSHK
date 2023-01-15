@@ -5,7 +5,7 @@
 "sequence": {
 	"order": "step_1",
 	"step_1": {
-		"order": "look_at_1,time_1,say_1,time_1,look_at_2",
+		"order": "look_at_1,time_1,say_1,time_1,look_at_2,time_1",
 		"look_at_1": {
 			"x": 5.0,
 			"y": 10.0,
