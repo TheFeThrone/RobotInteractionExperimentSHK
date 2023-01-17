@@ -11,11 +11,13 @@ import java.nio.charset.Charset
 open class JsonLoader(path: String) {
 
     private val file = File("${Environment.getExternalStorageDirectory()}/RIE/$path")
+    private lateinit var fileContent: String
     private lateinit var items: JsonElement
 
     protected fun loadData() {
         try {
-            items = Json.parseToJsonElement(file.readText(Charset.defaultCharset()))
+            fileContent = file.readText(Charset.defaultCharset())
+            items = Json.parseToJsonElement(fileContent)
         }
         catch (e: Exception) {
             throw FileNotFoundException()
@@ -42,5 +44,9 @@ open class JsonLoader(path: String) {
             file.createNewFile()
         }
         file.writeText(data)
+    }
+
+    fun getFullData(): String {
+        return fileContent
     }
 }

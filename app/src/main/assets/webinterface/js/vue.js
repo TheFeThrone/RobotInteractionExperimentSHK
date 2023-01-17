@@ -1,6 +1,6 @@
 var experimentElement = {
-    props: ['step', 'currentState'],
-    template: `<button v-if="step.index == currentState.index && !currentState.stopped" class="grid-item active" @click="buttonClick(step.index)">{{step.item}}</button><button v-else-if="step.index == currentState.index" class="grid-item stopped" @click="buttonClick(step.index)">{{step.item}}</button><button v-else class="grid-item" @click="buttonClick(step.index)">{{step.item}}</button>`,
+    props: ['step', 'experimentState'],
+    template: `<button v-if="step.index == experimentState.index && !experimentState.stopped" class="grid-item active" @click="buttonClick(step.index)">{{step.item}}</button><button v-else-if="step.index == experimentState.index" class="grid-item stopped" @click="buttonClick(step.index)">{{step.item}}</button><button v-else class="grid-item" @click="buttonClick(step.index)">{{step.item}}</button>`,
     methods: {
         buttonClick: (index) => {
             vm.buttonClick(index);
@@ -23,11 +23,19 @@ var noConnection = {
     }
 }
 
-var parent = {
-    props: ['connection', 'steps', 'currentState'],
-    template: '<div v-if="connection" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:current-state="currentState"></experiment-element></div><div v-else class="general-container"><no-connection></no-connection></div>',
+var state = {
+    props: ['steps', 'experimentState', 'currentState'],
+    template: '<div v-if="currentState == 0" class="one-element-container"></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div>',
     components: {
-        "experiment-element": experimentElement,
+        "experiment-element": experimentElement
+    }
+}
+
+var parent = {
+    props: ['connection', 'steps', 'experimentState', 'currentState'],
+    template: '<div v-if="connection" class="test"><state v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:current-state="currentState"></state></div><div v-else class="one-element-container"><no-connection></no-connection></div>',
+    components: {
+        "state": state,
         "no-connection": noConnection
     }
 }
@@ -35,30 +43,34 @@ var parent = {
 var vm = new Vue({
   el: '#app',
   data: {
-    currentState: {
+    experimentState: {
         index: null,
         stopped: false
     },
+    currentState: 1,
     experiment: null,
     response: null,
     connection: null,
-    steps: null
+    steps: []
   },
   methods: {
     loadExperiment: async function() {
         var response = await fetch("/data");
         this.response = await response.json();
-        this.experiment = this.response.steps;
-        this.steps = this.experiment;
-        console.log(this.steps);
+        this.experiment = this.response.sequence.order.split(',');
+        var i = 0;
+        this.steps = [];
+        for (step of this.experiment) {
+            newStep = {index: i, item: step};
+            this.steps.push(newStep);
+            i++;
+        }
     },
     init: function() {
         this.connection = new WebSocket("ws://" + location.host + "/websocket");
 
         this.connection.onmessage = (event) => {
-            if (event.data != "Alive") {
-                this.currentState = JSON.parse(event.data);
-            }
+            this.experimentState = JSON.parse(event.data);
         };
         this.connection.onopen = (event) => {
             console.log("Connected.");
@@ -87,6 +99,7 @@ var vm = new Vue({
   components: {
     "experiment-element": experimentElement,
     "parent": parent,
-    "no-connection": noConnection
+    "no-connection": noConnection,
+    "state": state
   }
 });

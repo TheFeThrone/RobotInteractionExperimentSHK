@@ -10,12 +10,12 @@ body {
     margin: 1% 5% 1%;
 }
 
-.general-container {
+.one-element-container {
     display: grid;
     grid-template-columns: 1fr;
     grid-auto-rows: 100%;
     grid-gap: 20px;
-    margin: 1% 5% 1%;
+    margin: 3% 10% 3%;
 }
 
 .grid-item {

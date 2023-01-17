@@ -1,5 +1,5 @@
 package de.dollendorf.rie
 
-interface ExperimentObserverInterface {
+interface ExperimentObserverInterface : ObserverInterface {
     fun updateExperimentState(experimentState: ExperimentState)
 }
