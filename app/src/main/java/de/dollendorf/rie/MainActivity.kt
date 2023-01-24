@@ -40,11 +40,13 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
                 setContentView(R.layout.activity_main)
             }
             init = true
-            val experimentObserver = ExperimentObserver()
             val webInterface = Webinterface(8080)
-            experimentObserver.registerObserver(webInterface)
-            val experimentHandler = ExperimentHandler(experiment, lookAt, speech, webInterface, experimentObserver)
-            experimentHandler.start()
+            val experimentHandler = ExperimentHandler(experiment, lookAt, speech, webInterface)
+
+            webInterface.setExperimentHandler(experimentHandler)
+
+            experimentHandler.registerObserver(webInterface)
+            webInterface.registerObserver(experimentHandler)
             webInterface.startServer(assets, experiment)
         } else {
             resume()

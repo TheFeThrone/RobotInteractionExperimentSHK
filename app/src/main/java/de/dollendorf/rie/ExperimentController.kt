@@ -1,9 +1,9 @@
 package de.dollendorf.rie
 
-class ExperimentController : Observer() {
-    fun jumpToExperimentState(experimentState: ExperimentState) {
+abstract class ExperimentController : Observer() {
+    fun triggerCommand(command: String) {
         for (observer in observers as ArrayList<ExperimentControllerInterface>) {
-            observer.jumpToExperimentState(experimentState)
+            observer.triggerCommand(command)
         }
     }
 }

@@ -16,9 +16,10 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class Webinterface(private val port: Int) : ExperimentObserverInterface {
+class Webinterface(private val port: Int) : ExperimentController(), ExperimentObserverInterface {
 
     private val sessions = ArrayList<WebSocketServerSession>()
+    private lateinit var experimentHandler: ExperimentHandler
 
     fun startServer(assets: AssetManager, experimentLoader: ExperimentLoader) {
 
@@ -41,11 +42,15 @@ class Webinterface(private val port: Int) : ExperimentObserverInterface {
                 get("/data") {
                     call.respondText(experimentLoader.getFullData())
                 }
+                get("/currentstate") {
+                    call.respondText(experimentHandler.getRunningState().toString())
+                }
                 webSocket("/websocket") {
                     try {
                         sessions.add(this)
                         for (frame in incoming) {
-                            println((frame as Frame.Text).readText())
+                            val command = (frame as Frame.Text).readText()
+                            triggerCommand(command)
                         }
                     } catch (e: ClosedReceiveChannelException) {
                         println("Client disconnected.")
@@ -67,9 +72,20 @@ class Webinterface(private val port: Int) : ExperimentObserverInterface {
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun updateExperimentState(experimentState: ExperimentState) {
-        val text = Json.encodeToString(experimentState)
+        sendText(Json.encodeToString(experimentState))
+    }
+
+    override fun updateRunningState(state: Int) {
+        sendText("new-state $state")
+    }
+
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun sendText(text: String) {
         GlobalScope.async { send(text) }
+    }
+
+    fun setExperimentHandler(experimentHandler: ExperimentHandler) {
+        this.experimentHandler = experimentHandler
     }
 }

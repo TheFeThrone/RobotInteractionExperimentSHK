@@ -18,7 +18,7 @@ body {
     margin: 3% 10% 3%;
 }
 
-.grid-item {
+.grid-item, .start-experiment {
     border: 3px solid #17365c;
     border-radius: 10px;
     text-decoration: none;
@@ -28,7 +28,11 @@ body {
     transition-duration: 0.5s;
 }
 
-.grid-item:hover, .grid-item.active:hover {
+.start-experiment {
+    padding: 20px 0px 20px
+}
+
+.grid-item:hover, .grid-item.active:hover, .start-experiment:hover {
     border-color: #8dae10;
     color: #8dae10;
     background-color: #17365c;
@@ -53,7 +57,7 @@ body {
     text-align: center;
     font-size: 20px;
     background-color: red;
-    padding: 20px 0cm 20px;
+    padding: 20px 0px 20px;
     transition-duration: 0.5s;
 }
 

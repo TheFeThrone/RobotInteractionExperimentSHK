@@ -5,16 +5,31 @@
 "sequence": {
 	"order": "look_at_1,time_1,say_1,time_1,look_at_2,time_1",
 	"look_at_1": {
-		"x": 5.0,
-		"y": 10.0,
-		"z": 3.0
+		"value": {
+			"x": 5.0,
+			"y": 10.0,
+			"z": 3.0
 		},
-	"time_1": 5000,
-	"say_1": "Hello, my name is Pepper.",
+		"requires_user_interaction": false,
+		"stopping": true
+		},
+	"time_1": {
+		"value": 5000,
+		"requires_user_interaction": false,
+		"stopping": false
+	},
+	"say_1": {
+		"value": "Hello, my name is Pepper.",
+		"requires_user_interaction": false,
+		"stopping": true
+	},
 	"look_at_2": {
-		"x": -5.0,
-		"y": 10.0,
-		"z": 0.0
-		}
+		"value": {
+			"x": -5.0,
+			"y": 10.0,
+			"z": 0.0
+		},
+		"requires_user_interaction": false,
+		"stopping": false}
 	}
 }

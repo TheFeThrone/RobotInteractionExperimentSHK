@@ -1,11 +1,11 @@
 package de.dollendorf.rie
 
+import com.aldebaran.qi.Future
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.`object`.conversation.Phrase
 import com.aldebaran.qi.sdk.`object`.conversation.Say
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.builder.SayBuilder
-import java.util.concurrent.Future
 
 class Speech(private val qiContext: QiContext, private val locale: Locale) {
 

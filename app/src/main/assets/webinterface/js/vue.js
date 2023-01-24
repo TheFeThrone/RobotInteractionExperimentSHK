@@ -25,15 +25,21 @@ var noConnection = {
 
 var state = {
     props: ['steps', 'experimentState', 'currentState'],
-    template: '<div v-if="currentState == 0" class="one-element-container"></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div>',
+    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div>',
+    methods: {
+        startExperiment: () => {
+            vm.startExperiment();
+        }
+    },
     components: {
-        "experiment-element": experimentElement
+        "experiment-element": experimentElement,
+        "vm": vm
     }
 }
 
 var parent = {
     props: ['connection', 'steps', 'experimentState', 'currentState'],
-    template: '<div v-if="connection" class="test"><state v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:current-state="currentState"></state></div><div v-else class="one-element-container"><no-connection></no-connection></div>',
+    template: '<div v-if="connection"><state v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:current-state="currentState"></state></div><div v-else class="one-element-container"><no-connection></no-connection></div>',
     components: {
         "state": state,
         "no-connection": noConnection
@@ -47,7 +53,7 @@ var vm = new Vue({
         index: null,
         stopped: false
     },
-    currentState: 1,
+    currentState: 0,
     experiment: null,
     response: null,
     connection: null,
@@ -55,8 +61,10 @@ var vm = new Vue({
   },
   methods: {
     loadExperiment: async function() {
-        var response = await fetch("/data");
-        this.response = await response.json();
+        var dataResponse = await fetch("/data");
+        var stateResponse = await fetch("/currentstate");
+        this.response = await dataResponse.json();
+        this.currentState = await stateResponse.json();
         this.experiment = this.response.sequence.order.split(',');
         var i = 0;
         this.steps = [];
@@ -70,7 +78,12 @@ var vm = new Vue({
         this.connection = new WebSocket("ws://" + location.host + "/websocket");
 
         this.connection.onmessage = (event) => {
-            this.experimentState = JSON.parse(event.data);
+            console.log(event);
+            if (event.data.startsWith("new-state")) {
+                this.currentState = event.data.split(" ")[1];
+            } else {
+                this.experimentState = JSON.parse(event.data);
+            }
         };
         this.connection.onopen = (event) => {
             console.log("Connected.");
@@ -89,7 +102,10 @@ var vm = new Vue({
         vm.init();
     },
     buttonClick(index) {
-        this.connection.send("execute " + index);
+        this.connection.send("{\"type\": jumpto, \"value\": " + index + "}");
+    },
+    startExperiment() {
+        this.connection.send("{\"type\": start}");
     }
   },
   mounted: function() {

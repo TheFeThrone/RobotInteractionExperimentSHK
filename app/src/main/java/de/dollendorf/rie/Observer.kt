@@ -1,6 +1,6 @@
 package de.dollendorf.rie
 
-open class Observer {
+abstract class Observer {
     protected var observers = ArrayList<ObserverInterface>()
 
     fun registerObserver(observer: ObserverInterface) {
