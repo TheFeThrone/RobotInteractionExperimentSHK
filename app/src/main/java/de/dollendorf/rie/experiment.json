@@ -1,35 +1,40 @@
 {
-"experiment": {
-	"name": "Test"
-	},
-"sequence": {
-	"order": "look_at_1,time_1,say_1,time_1,look_at_2,time_1",
-	"look_at_1": {
-		"value": {
-			"x": 5.0,
-			"y": 10.0,
-			"z": 3.0
+	"experiment": {
+		"name": "Test"
 		},
-		"requires_user_interaction": false,
-		"stopping": true
+	"sequence": {
+		"order": "look_at_1,time_1,say_1,time_1,look_at_2,time_1",
+		"look_at_1": {
+			"friendly_name": "Look at target",
+			"value": {
+				"x": 5.0,
+				"y": 10.0,
+				"z": 3.0
+			},
+			"requires_user_interaction": false,
+			"stopping": true
+			},
+		"time_1": {
+			"friendly_name": "Wait",
+			"value": 5000,
+			"requires_user_interaction": false,
+			"stopping": false
 		},
-	"time_1": {
-		"value": 5000,
-		"requires_user_interaction": false,
-		"stopping": false
-	},
-	"say_1": {
-		"value": "Hello, my name is Pepper.",
-		"requires_user_interaction": false,
-		"stopping": true
-	},
-	"look_at_2": {
-		"value": {
-			"x": -5.0,
-			"y": 10.0,
-			"z": 0.0
+		"say_1": {
+			"friendly_name": "Say",
+			"value": "Hello, my name is Pepper.",
+			"requires_user_interaction": true,
+			"stopping": true
 		},
-		"requires_user_interaction": false,
-		"stopping": false}
+		"look_at_2": {
+			"friendly_name": "Look at target",
+			"value": {
+				"x": -5.0,
+				"y": 10.0,
+				"z": 0.0
+			},
+			"requires_user_interaction": false,
+			"stopping": false
+		}
 	}
 }

@@ -1,6 +1,6 @@
 var experimentElement = {
     props: ['step', 'experimentState'],
-    template: `<button v-if="step.index == experimentState.index && !experimentState.stopped" class="grid-item active" @click="buttonClick(step.index)">{{step.item}}</button><button v-else-if="step.index == experimentState.index" class="grid-item stopped" @click="buttonClick(step.index)">{{step.item}}</button><button v-else class="grid-item" @click="buttonClick(step.index)">{{step.item}}</button>`,
+    template: `<button v-if="step.index == experimentState.index && !experimentState.requiresUserInteraction" class="grid-item active" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}</button><button v-else-if="step.index == experimentState.index" class="grid-item stopped" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}</button><button v-else class="grid-item" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}</button>`,
     methods: {
         buttonClick: (index) => {
             vm.buttonClick(index);
@@ -9,6 +9,11 @@ var experimentElement = {
     components: {
         "vm": vm
     }
+}
+
+var decisionElement = {
+    props: ['element'],
+    template: `<button class="grid-item"></button>`
 }
 
 var noConnection = {
@@ -65,14 +70,23 @@ var vm = new Vue({
         var stateResponse = await fetch("/currentstate");
         this.response = await dataResponse.json();
         this.currentState = await stateResponse.json();
-        this.experiment = this.response.sequence.order.split(',');
+        var experimentSteps = this.response.sequence.order.split(',');
         var i = 0;
         this.steps = [];
-        for (step of this.experiment) {
-            newStep = {index: i, item: step};
+        for (step of experimentSteps) {
+            var value = this.response.sequence[step].value
+            if (typeof value == "object") {
+                var newValue = ""
+                for (key in value) {
+                    newValue += (key + ": " + value[key] + " ");
+                }
+                value = newValue
+            }
+            newStep = {index: i, item: step, friendlyName: this.response.sequence[step].friendly_name, value: value};
             this.steps.push(newStep);
             i++;
         }
+        console.log(this.steps);
     },
     init: function() {
         this.connection = new WebSocket("ws://" + location.host + "/websocket");
