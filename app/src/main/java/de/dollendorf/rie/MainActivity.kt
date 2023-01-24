@@ -1,8 +1,6 @@
 package de.dollendorf.rie
 
-import android.os.Build
 import android.os.Bundle
-import androidx.annotation.RequiresApi
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
@@ -41,7 +39,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             }
             init = true
             val webInterface = Webinterface(8080)
-            val experimentHandler = ExperimentHandler(experiment, lookAt, speech, webInterface)
+            val experimentHandler = ExperimentHandler(experiment, lookAt, speech)
 
             webInterface.setExperimentHandler(experimentHandler)
 
