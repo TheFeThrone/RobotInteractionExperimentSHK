@@ -24,7 +24,25 @@
 			"friendly_name": "Say",
 			"value": "Hello, my name is Pepper.",
 			"requires_user_interaction": true,
-			"stopping": true
+			"stopping": true,
+			"possibilities": {
+				"order": "say_1,say_2,say_3",
+				"say_1": {
+					"friendly_name": "Say",
+					"value": "You clicked the first option.",
+					"stopping": true
+				},
+				"say_2": {
+					"friendly_name": "Say",
+					"value": "You clicked the second option.",
+					"stopping": true
+				},
+				"say_3": {
+					"friendly_name": "Say",
+					"value": "You clicked the third option.",
+					"stopping": true
+				}
+			}
 		},
 		"look_at_2": {
 			"friendly_name": "Look at target",

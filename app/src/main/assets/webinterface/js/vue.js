@@ -1,9 +1,9 @@
 var experimentElement = {
     props: ['step', 'experimentState'],
-    template: `<button v-if="step.index == experimentState.index && !experimentState.requiresUserInteraction" class="grid-item active" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}</button><button v-else-if="step.index == experimentState.index" class="grid-item stopped" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}</button><button v-else class="grid-item" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}</button>`,
+    template: `<button v-if="step.index == experimentState.index && !experimentState.requiresUserInteraction" class="grid-item active" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}<br>{{step.shortValue}}</button><button v-else-if="step.index == experimentState.index" class="grid-item stopped" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}<br>{{step.shortValue}}</button><button v-else class="grid-item" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}<br>{{step.shortValue}}</button>`,
     methods: {
         buttonClick: (index) => {
-            vm.buttonClick(index);
+            vm.jumpButtonClick(index);
         }
     },
     components: {
@@ -13,7 +13,15 @@ var experimentElement = {
 
 var decisionElement = {
     props: ['element'],
-    template: `<button class="grid-item"></button>`
+    template: `<button class="grid-item" :title="element.value" @click="buttonClick(element.index)">{{element.friendlyName}}<br>{{element.shortValue}}</button>`,
+    methods: {
+        buttonClick: (index) => {
+            vm.decisionButtonClick(index);
+        }
+    },
+    components: {
+        "vm": vm
+    }
 }
 
 var noConnection = {
@@ -30,7 +38,7 @@ var noConnection = {
 
 var state = {
     props: ['steps', 'experimentState', 'currentState'],
-    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div>',
+    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div><div v-else-if="currentState == 2" class="grid-container"><decision-element v-for="element in steps[experimentState.index].possibilities" v-bind:element="element"></decision-element></div>',
     methods: {
         startExperiment: () => {
             vm.startExperiment();
@@ -38,6 +46,7 @@ var state = {
     },
     components: {
         "experiment-element": experimentElement,
+        "decision-element": decisionElement,
         "vm": vm
     }
 }
@@ -75,6 +84,7 @@ var vm = new Vue({
         this.steps = [];
         for (step of experimentSteps) {
             var value = this.response.sequence[step].value
+            var shortValue = ""
             if (typeof value == "object") {
                 var newValue = ""
                 for (key in value) {
@@ -82,7 +92,28 @@ var vm = new Vue({
                 }
                 value = newValue
             }
-            newStep = {index: i, item: step, friendlyName: this.response.sequence[step].friendly_name, value: value};
+            shortValue = value;
+            var possibilities = [];
+            var possibilitiesJson = this.response.sequence[step].possibilities;
+            if (possibilitiesJson) {
+                possibleSteps = possibilitiesJson.order.split(",");
+                var j = 0;
+                for (possibleStep of possibleSteps) {
+                    var possibilityValue = possibilitiesJson[possibleStep].value
+                    var shortPossibilityValue = ""
+                    if (typeof possibilityValue == "object") {
+                        var newPossibilityValue = ""
+                        for (key in possibilityValue) {
+                            newPossibilityValue += (key + ": " + possibilityValue[key] + " ");
+                        }
+                        possibilityValue = newPossibilityValue
+                    }
+                    shortPossibilityValue = possibilityValue;
+                    newPossibility = {index: j, item: possibleStep, friendlyName: possibilitiesJson[possibleStep].friendly_name, value: possibilityValue, shortValue: shortPossibilityValue}
+                    possibilities.push(newPossibility)
+                }
+            }
+            newStep = {index: i, item: step, friendlyName: this.response.sequence[step].friendly_name, value: value, shortValue: shortValue, possibilities: possibilities};
             this.steps.push(newStep);
             i++;
         }
@@ -115,8 +146,11 @@ var vm = new Vue({
         vm.loadExperiment();
         vm.init();
     },
-    buttonClick(index) {
+    jumpButtonClick(index) {
         this.connection.send("{\"type\": jumpto, \"value\": " + index + "}");
+    },
+    decisionButtonClick(index) {
+        this.connection.send("{\"type\": decision, \"value\": " + index + "}");
     },
     startExperiment() {
         this.connection.send("{\"type\": start}");
@@ -128,6 +162,7 @@ var vm = new Vue({
   },
   components: {
     "experiment-element": experimentElement,
+    "decision-element": decisionElement,
     "parent": parent,
     "no-connection": noConnection,
     "state": state

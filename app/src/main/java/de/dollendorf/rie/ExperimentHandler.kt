@@ -12,10 +12,12 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     private var currentStep = 0
     private var items: List<String>? = null
     private var runningState = 0
-    private val thread = Thread(this)
+    private var thread = Thread(this)
     private var executorThread = Thread()
+    private var interrupt = false
 
     override fun run() {
+        interrupt = false
         startExperiment()
     }
 
@@ -26,20 +28,23 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
         steps = experiment.getElement("sequence/order")?.split(",")
 
         for (counter in currentStep until steps!!.size) {
+            if (interrupt) {
+                break;
+            }
             currentStep = counter
             executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, this))
-            println(executorThread)
             executorThread.start()
             executorThread.join()
         }
     }
 
     fun pauseExperiment() {
-
+        interrupt = true
     }
 
     fun resumeExperiment() {
-
+        thread = Thread(this)
+        thread.start()
     }
 
     private fun cancelMovements() {
@@ -64,8 +69,17 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
                 thread.start()
             }
             "jumpto" -> {
-                currentStep = json["value"].toString().toInt()
-                thread.start()
+                try {
+                    interrupt = true
+                    executorThread.interrupt()
+                } finally {
+                    currentStep = json["value"].toString().toInt()
+                    thread = Thread(this)
+                    thread.start()
+                }
+            }
+            "decision" -> {
+
             }
             else -> println("Command not found.")
         }

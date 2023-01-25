@@ -23,7 +23,10 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                 val lookAtFuture = lookAt.startLookAt(x, y, z)
             }
             "time" -> {
-                Thread.sleep(experiment.getElement("sequence/$currentStepName/value")!!.toLong())
+                try {
+                    Thread.sleep(experiment.getElement("sequence/$currentStepName/value")!!.toLong())
+                }
+                catch (_: InterruptedException) {}
             }
             /*"await" -> {
                 val phraseSet = PhraseSetBuilder.with(qiContext).withTexts("Hello", "Hi").build() // Move to external class
@@ -35,6 +38,10 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                 }
             }
             else -> println("Item not found")
+        }
+
+        if (requiresUserInteraction) {
+            experimentHandler.updateRunningState(2)
         }
     }
 

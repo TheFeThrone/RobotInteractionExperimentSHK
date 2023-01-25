@@ -1,8 +1,11 @@
 package de.dollendorf.rie
 
 import android.os.Bundle
+import com.aldebaran.qi.sdk.Qi
 import com.aldebaran.qi.sdk.QiContext
+import com.aldebaran.qi.sdk.QiRobot
 import com.aldebaran.qi.sdk.QiSDK
+import com.aldebaran.qi.sdk.QiThreadPool
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.aldebaran.qi.sdk.`object`.actuation.FreeFrame
 import com.aldebaran.qi.sdk.design.activity.RobotActivity
