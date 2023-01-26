@@ -23,21 +23,26 @@ class Webinterface(private val port: Int) : ExperimentController(), ExperimentOb
 
     fun startServer(assets: AssetManager, experimentLoader: ExperimentLoader) {
 
-        val vue = assets.open("webinterface/js/vue.js").bufferedReader().use { it.readText() }
-        val html = assets.open("webinterface/index.html").bufferedReader().use { it.readText() }
-        val css = assets.open("webinterface/css/style.css").bufferedReader().use { it.readText() }
-
         val server = embeddedServer(Netty, port) {
             install(WebSockets)
             routing {
                 get("/") {
-                    call.respondText(html, ContentType.Text.Html)
+                    call.respondText(assets.open("webinterface/index.html").bufferedReader().use { it.readText() }, ContentType.Text.Html)
+                }
+                get("index.html") {
+                    call.respondText(assets.open("webinterface/index.html").bufferedReader().use { it.readText() }, ContentType.Text.Html)
+                }
+                get("experiment.html") {
+                    call.respondText(assets.open("webinterface/experiment.html").bufferedReader().use { it.readText() }, ContentType.Text.Html)
+                }
+                get("config.html") {
+                    call.respondText(assets.open("webinterface/config.html").bufferedReader().use { it.readText() }, ContentType.Text.Html)
                 }
                 get("/js/vue.js") {
-                    call.respondText(vue, ContentType.Text.JavaScript)
+                    call.respondText(assets.open("webinterface/js/vue.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
                 }
                 get("/css/style.css") {
-                    call.respondText(css, ContentType.Text.CSS)
+                    call.respondText(assets.open("webinterface/css/style.css").bufferedReader().use { it.readText() }, ContentType.Text.CSS)
                 }
                 get("/data") {
                     call.respondText(experimentLoader.getFullData())
@@ -66,7 +71,7 @@ class Webinterface(private val port: Int) : ExperimentController(), ExperimentOb
         server.start(true)
     }
 
-    suspend fun send(text: String) {
+    private suspend fun send(text: String) {
         for (session in sessions) {
             session.outgoing.send(Frame.Text(text))
         }
