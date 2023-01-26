@@ -12,8 +12,8 @@ var experimentElement = {
 }
 
 var decisionElement = {
-    props: ['element'],
-    template: `<button class="grid-item" :title="element.value" @click="buttonClick(element.index)">{{element.friendlyName}}<br>{{element.shortValue}}</button>`,
+    props: ['element', 'decisionState'],
+    template: `<button v-if="decisionState.index == element.index" class="grid-item active" :title="element.value" @click="buttonClick(element.index)">{{element.friendlyName}}<br>{{element.shortValue}}</button><button v-else class="grid-item" :title="element.value" @click="buttonClick(element.index)">{{element.friendlyName}}<br>{{element.shortValue}}</button>`,
     methods: {
         buttonClick: (index) => {
             vm.decisionButtonClick(index);
@@ -37,8 +37,8 @@ var noConnection = {
 }
 
 var state = {
-    props: ['steps', 'experimentState', 'currentState'],
-    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div><div v-else-if="currentState == 2" class="grid-container"><decision-element v-for="element in steps[experimentState.index].possibilities" v-bind:element="element"></decision-element></div>',
+    props: ['steps', 'experimentState', 'decisionState', 'currentState'],
+    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div><div v-else-if="currentState == 2" class="grid-container"><decision-element v-for="element in steps[experimentState.index].possibilities" v-bind:element="element" v-bind:decision-state="decisionState"></decision-element></div>',
     methods: {
         startExperiment: () => {
             vm.startExperiment();
@@ -52,8 +52,8 @@ var state = {
 }
 
 var parent = {
-    props: ['connection', 'steps', 'experimentState', 'currentState'],
-    template: '<div v-if="connection"><state v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:current-state="currentState"></state></div><div v-else class="one-element-container"><no-connection></no-connection></div>',
+    props: ['connection', 'steps', 'experimentState', 'decisionState', 'currentState'],
+    template: '<div v-if="connection"><state v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:current-state="currentState" v-bind:decision-state="decisionState"></state></div><div v-else class="one-element-container"><no-connection></no-connection></div>',
     components: {
         "state": state,
         "no-connection": noConnection
@@ -64,8 +64,10 @@ var vm = new Vue({
   el: '#app',
   data: {
     experimentState: {
-        index: null,
-        stopped: false
+        index: null
+    },
+    decisionState: {
+        index: null
     },
     currentState: 0,
     experiment: null,
@@ -111,7 +113,9 @@ var vm = new Vue({
                     shortPossibilityValue = possibilityValue;
                     newPossibility = {index: j, item: possibleStep, friendlyName: possibilitiesJson[possibleStep].friendly_name, value: possibilityValue, shortValue: shortPossibilityValue}
                     possibilities.push(newPossibility)
+                    j++;
                 }
+                possibilities.push({index: j, item: "exit", friendlyName: "Return without choice.", value: "", shortValue: ""})
             }
             newStep = {index: i, item: step, friendlyName: this.response.sequence[step].friendly_name, value: value, shortValue: shortValue, possibilities: possibilities};
             this.steps.push(newStep);
@@ -127,7 +131,12 @@ var vm = new Vue({
             if (event.data.startsWith("new-state")) {
                 this.currentState = event.data.split(" ")[1];
             } else {
-                this.experimentState = JSON.parse(event.data);
+                if (this.currentState == 1) {
+                    this.experimentState = JSON.parse(event.data);
+                    this.decisionState = {index: null};
+                } else if (this.currentState == 2) {
+                    this.decisionState = JSON.parse(event.data);
+                }
             }
         };
         this.connection.onopen = (event) => {

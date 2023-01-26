@@ -15,6 +15,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     private var thread = Thread(this)
     private var executorThread = Thread()
     private var interrupt = false
+    private var decision: Int? = null
 
     override fun run() {
         interrupt = false
@@ -31,6 +32,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             if (interrupt) {
                 break;
             }
+            decision = null
             currentStep = counter
             executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, this))
             executorThread.start()
@@ -79,9 +81,13 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
                 }
             }
             "decision" -> {
-
+                decision = json["value"].toString().toInt()
             }
             else -> println("Command not found.")
         }
+    }
+
+    fun getDecision(): Int? {
+        return decision
     }
 }
