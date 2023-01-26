@@ -45,6 +45,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     }
 
     fun resumeExperiment() {
+        currentStep++
         thread = Thread(this)
         thread.start()
     }

@@ -18,6 +18,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var speech: Speech
     private lateinit var config: Config
     private lateinit var experiment: ExperimentLoader
+    private lateinit var experimentHandler: ExperimentHandler
     private var init = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +43,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             }
             init = true
             val webInterface = Webinterface(8080)
-            val experimentHandler = ExperimentHandler(experiment, lookAt, speech)
+            experimentHandler = ExperimentHandler(experiment, lookAt, speech)
 
             webInterface.setExperimentHandler(experimentHandler)
 
@@ -64,11 +65,11 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     }
 
     private fun resume() {
-        println("Resumed")
+        experimentHandler.resumeExperiment()
     }
 
     private fun storeState() {
-        println("Storing state")
+        experimentHandler.pauseExperiment()
     }
 
     fun setBaseFrame(baseFrame: FreeFrame) {
