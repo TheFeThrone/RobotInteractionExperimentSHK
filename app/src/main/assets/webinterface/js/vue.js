@@ -38,7 +38,7 @@ var noConnection = {
 
 var state = {
     props: ['steps', 'experimentState', 'decisionState', 'currentState'],
-    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div><div v-else-if="currentState == 2" class="grid-container"><decision-element v-for="element in steps[experimentState.index].possibilities" v-bind:element="element" v-bind:decision-state="decisionState"></decision-element></div>',
+    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" :key="step.index" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div><div v-else-if="currentState == 2" class="grid-container"><decision-element v-for="element in steps[experimentState.index].possibilities" :key="element.index" v-bind:element="element" v-bind:decision-state="decisionState"></decision-element></div>',
     methods: {
         startExperiment: () => {
             vm.startExperiment();
@@ -121,33 +121,32 @@ var vm = new Vue({
             this.steps.push(newStep);
             i++;
         }
-        console.log(this.steps);
     },
     init: function() {
         this.connection = new WebSocket("ws://" + location.host + "/websocket");
 
         this.connection.onmessage = (event) => {
-            console.log(event);
             if (event.data.startsWith("new-state")) {
                 this.currentState = event.data.split(" ")[1];
+                if (this.currentState == 1) {
+                    this.experimentState = {index: null};
+                } else if (this.currentState == 2) {
+                    this.decisionState = {index: null};
+                }
             } else {
                 if (this.currentState == 1) {
                     this.experimentState = JSON.parse(event.data);
-                    this.decisionState = {index: null};
                 } else if (this.currentState == 2) {
                     this.decisionState = JSON.parse(event.data);
                 }
             }
         };
         this.connection.onopen = (event) => {
-            console.log("Connected.");
         };
         this.connection.onclose = (event) => {
-            console.log(event);
             this.connection = null;
         };
         this.connection.onerror = (event) => {
-            console.log(event);
             this.connection = null;
         };
     },

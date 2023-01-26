@@ -24,9 +24,4 @@ class LookAtTarget(private val qiContext: QiContext, private val baseFrame: Free
         lookAtFuture = lookAt.async().run()
         return lookAtFuture
     }
-
-    fun isCompleted() : Boolean {
-        println(qiContext.actuation.robotFrame().computeTransform(targetFrame.frame()).transform)
-        return qiContext.actuation.robotFrame() == targetFrame.frame()
-    }
 }

@@ -44,6 +44,9 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             "look_at" -> {
                 //cancelMovements()
                 val lookAtFuture = lookAt.startLookAt(value[0].code.toDouble(), value[1].code.toDouble(), value[2].code.toDouble())
+                /*if (stopping) {
+                    lookAtFuture?.sync()
+                }*/
             }
             "time" -> {
                 try {
@@ -51,9 +54,6 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                 }
                 catch (_: InterruptedException) {}
             }
-            /*"await" -> {
-                val phraseSet = PhraseSetBuilder.with(qiContext).withTexts("Hello", "Hi").build() // Move to external class
-            }*/
             "say" -> {
                 val sayFuture = speech.say(value)
                 if (stopping) {
