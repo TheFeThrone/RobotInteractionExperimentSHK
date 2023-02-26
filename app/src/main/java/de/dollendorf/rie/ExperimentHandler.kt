@@ -16,6 +16,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     private var executorThread = Thread()
     private var interrupt = false
     private var decision: Int? = null
+    private var executeAgain = true
 
     override fun run() {
         interrupt = false
@@ -23,6 +24,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     }
 
     private fun startExperiment() {
+
         runningState = 1
         updateRunningState(runningState)
 
@@ -34,7 +36,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             }
             decision = null
             currentStep = counter
-            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, this))
+            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, this, executeAgain))
             executorThread.start()
             executorThread.join()
         }
@@ -50,8 +52,13 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
         thread.start()
     }
 
-    private fun cancelMovements() {
+    fun cancelMovements() {
+        println("Cancelling Movements")
         lookAtFuture?.requestCancellation()
+    }
+
+    fun setLookAtFuture(lookAtFuture: Future<Void>) {
+        this.lookAtFuture = lookAtFuture
     }
 
     fun getCurrentStep(): Int {
@@ -83,6 +90,17 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             }
             "decision" -> {
                 decision = json["value"].toString().toInt()
+                val possibilities = experiment.getElement("sequence/${steps?.get(currentStep)}/possibilities/order")!!.split(",")
+                val jump = experiment.getElement("sequence/${steps?.get(currentStep)}/possibilities/${possibilities[decision!!]}/jump")
+                if (jump != null && jump != "") {
+                    println("Jumping after decision")
+                    interrupt = true
+                    executorThread.join()
+                    currentStep = steps!!.indexOf(jump.substringBeforeLast(","))
+                    executeAgain = jump.substringAfter(",").toInt() != 0
+                    thread = Thread(this)
+                    thread.start()
+                }
             }
             else -> println("Command not found.")
         }

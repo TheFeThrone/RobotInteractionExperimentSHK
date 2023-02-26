@@ -12,7 +12,6 @@ class LookAtTarget(private val qiContext: QiContext, private val baseFrame: Free
 
     private var lookAtFuture: Future<Void>? = null
     private lateinit var targetFrame: FreeFrame
-    private lateinit var destinationFrame: FreeFrame
 
     fun startLookAt(targetX: Double, targetY: Double, targetZ: Double): Future<Void>? {
         lookAtFuture?.requestCancellation()

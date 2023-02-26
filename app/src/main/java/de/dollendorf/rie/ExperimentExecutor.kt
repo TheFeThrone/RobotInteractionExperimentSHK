@@ -1,6 +1,9 @@
 package de.dollendorf.rie
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val experimentHandler: ExperimentHandler) : Runnable {
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
 
     override fun run() {
         executeStep()
@@ -16,7 +19,9 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
 
         experimentHandler.updateExperimentState(ExperimentState(currentStep, stopping, requiresUserInteraction))
 
-        doStep(currentCommand, value!!, stopping)
+        if (executeAgain) {
+            doStep(currentCommand, value!!, stopping)
+        }
 
         if (requiresUserInteraction) {
             experimentHandler.updateRunningState(2)
@@ -40,10 +45,12 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
     }
 
     private fun doStep(currentCommand: String, value: String, stopping: Boolean) {
+        println("Executing $currentCommand with value $value")
         when (currentCommand) {
             "look_at" -> {
-                //cancelMovements()
-                val lookAtFuture = lookAt.startLookAt(value[0].code.toDouble(), value[1].code.toDouble(), value[2].code.toDouble())
+                experimentHandler.cancelMovements()
+                val coordinates = value.replace(Regex("\\{|\\}|x|y|z|:"), "").split(",")
+                experimentHandler.setLookAtFuture(lookAt.startLookAt(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())!!)
                 /*if (stopping) {
                     lookAtFuture?.sync()
                 }*/
@@ -59,6 +66,15 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                 if (stopping) {
                     sayFuture?.sync()
                 }
+            }
+            "sound" -> {
+                speech.play(value)
+            }
+            "reset_look" -> {
+                experimentHandler.cancelMovements()
+            }
+            "empty" -> {
+
             }
             else -> println("Item not found")
         }

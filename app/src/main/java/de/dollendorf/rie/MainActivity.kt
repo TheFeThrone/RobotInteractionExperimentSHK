@@ -50,6 +50,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             experimentHandler.registerObserver(webInterface)
             webInterface.registerObserver(experimentHandler)
             webInterface.startServer(assets, experiment)
+            qiContext.camera.makeTakePicture(qiContext.robotContext).async()
         } else {
             resume()
         }

@@ -94,7 +94,11 @@ var vm = new Vue({
                 }
                 value = newValue
             }
-            shortValue = value;
+            if (value.length >= 30) {
+                shortValue = value.substring(0, 27) + "...";
+            } else {
+                shortValue = value;
+            }
             var possibilities = [];
             var possibilitiesJson = this.response.sequence[step].possibilities;
             if (possibilitiesJson) {
@@ -109,6 +113,11 @@ var vm = new Vue({
                             newPossibilityValue += (key + ": " + possibilityValue[key] + " ");
                         }
                         possibilityValue = newPossibilityValue
+                    }
+                    if (possibilityValue.length >= 30) {
+                        shortPossibilityValue = possibilityValue.substring(0, 27) + "...";
+                    } else {
+                        shortPossibilityValue = possibilityValue;
                     }
                     shortPossibilityValue = possibilityValue;
                     newPossibility = {index: j, item: possibleStep, friendlyName: possibilitiesJson[possibleStep].friendly_name, value: possibilityValue, shortValue: shortPossibilityValue}
