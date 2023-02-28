@@ -122,7 +122,7 @@
 					"friendly_name": "Piepsen",
 					"value": "beep.mp3",
 					"stopping": true,
-					"jump": "say_6,0"
+					"jump": "say_8,0"
 				},
 				"empty_1": {
 					"friendly_name": "Nächste Runde",

@@ -17,6 +17,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     private var interrupt = false
     private var decision: Int? = null
     private var executeAgain = true
+    private var afterJump = false
 
     override fun run() {
         interrupt = false
@@ -35,6 +36,10 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
                 break;
             }
             decision = null
+            if (!afterJump) {
+                executeAgain = true
+            }
+            afterJump = false
             currentStep = counter
             executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, this, executeAgain))
             executorThread.start()
@@ -53,7 +58,6 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     }
 
     fun cancelMovements() {
-        println("Cancelling Movements")
         lookAtFuture?.requestCancellation()
     }
 
@@ -98,6 +102,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
                     executorThread.join()
                     currentStep = steps!!.indexOf(jump.substringBeforeLast(","))
                     executeAgain = jump.substringAfter(",").toInt() != 0
+                    afterJump = true
                     thread = Thread(this)
                     thread.start()
                 }

@@ -78,6 +78,7 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             }
             else -> println("Item not found")
         }
+        println("Finished current step")
     }
 
 }
