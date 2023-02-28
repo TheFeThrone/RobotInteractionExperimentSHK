@@ -1,4 +1,6 @@
 {
 "experiment": "experiment.json",
-  "language": "de_DE"
+  "language": "de_DE",
+  "speech_speed": 75,
+  "speech_pitch": 80
 }

@@ -3,7 +3,7 @@
 		"name": "Lilly"
 		},
 	"sequence": {
-		"order": "say_1,say_2,say_3,look_at_1,say_4,look_at_2,say_5,look_at_1,say_6,look_at_2,say_7,look_at_1,say_8,look_at_2,say_9",
+		"order": "say_1,say_2,say_3,look_at_1,say_4,look_at_2,say_5,look_at_1,say_6,look_at_2,say_7,look_at_1,say_8,look_at_2,say_9,say_10",
 		"say_1": {
 			"friendly_name": "Say",
 			"value": "Hallo, nett dich kennenzulernen. Ich freue mich auf unsere gemeinsame Zusammenarbeit und, dass du mich unterstützt.",
@@ -33,7 +33,7 @@
 		},
 		"say_3": {
 			"friendly_name": "Say",
-			"value": "Dann wollen wir mal mit der Aufgabe anfangen, bei der ich deine Hilfe brauche. Damit meine Arbeit optimal unterstützend bei der Montage sein kann fehlen mir noch einige Daten, weshalb wir diese nun generieren. Vor dir steht eine Box mit verschieden farbigen Steinen, bei denen ich die Form und Farbe für die Montage lernen muss. Bitte wähle zunächst alle blauen Steine aus und lege sie der Reihe nach vor mir in den markierten Bereich. Warte dann fünf Sekunden bis ich die Form und Farbe registriert habe. Anschließend muss der Stein nun einmal gedreht werden und erneut fünf Sekunden liegen bleiben. Nach einem Piepen kann der Stein weggenommen werden und der nächste Stein ist dran. Wir probieren das am besten mal mit allen blauen Steinen, die dort in der Box zu finden sind.",
+			"value": "Erklärung",
 			"requires_user_interaction": false,
 			"stopping": true
 		},
@@ -176,6 +176,12 @@
 					"jump": "say_9,0"
 				}
 			}
+		},
+		"say_10": {
+			"friendly_name": "Say",
+			"value": "Danke für die Teilnahme.",
+			"requires_user_interaction": false,
+			"stopping": true
 		}
 	}
 }

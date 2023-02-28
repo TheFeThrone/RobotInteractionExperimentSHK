@@ -10,12 +10,12 @@ import com.aldebaran.qi.sdk.`object`.conversation.Say
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.builder.SayBuilder
 
-class Speech(private val qiContext: QiContext, private val locale: Locale, private val mainActivity: MainActivity) {
+class Speech(private val qiContext: QiContext, private val locale: Locale, private val mainActivity: MainActivity, private val speed: Int, private val pitch: Int) {
 
     private var sayFuture: Future<Void>? = null
 
     fun say(text: String): Future<Void>? {
-        val say: Say = SayBuilder.with(qiContext).withPhrase(Phrase(text)).withLocale(locale).build()
+        val say: Say = SayBuilder.with(qiContext).withPhrase(Phrase("\\rspd=$speed\\ \\vct=$pitch\\ $text")).withLocale(locale).build()
         sayFuture = say.async().run()
         return sayFuture
     }
@@ -23,9 +23,6 @@ class Speech(private val qiContext: QiContext, private val locale: Locale, priva
     fun play(audioPath: String) {
         val mediaPlayer = MediaPlayer()
         mediaPlayer.setDataSource("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles/$audioPath")
-        /*mediaPlayer.setOnPreparedListener {
-            mediaPlayer.start()
-        }*/
         mediaPlayer.prepare()
         mediaPlayer.start()
         while (mediaPlayer.isPlaying) {

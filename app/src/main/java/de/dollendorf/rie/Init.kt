@@ -35,7 +35,7 @@ class Init(private val qiContext: QiContext) {
         } else {
             Locale(Language.ENGLISH, Region.UNITED_STATES)
         }
-        mainActivity.setSpeech(Speech(qiContext, locale, mainActivity))
+        mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
     }
 }
