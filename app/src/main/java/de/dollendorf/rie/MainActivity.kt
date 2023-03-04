@@ -1,11 +1,11 @@
 package de.dollendorf.rie
 
+import android.graphics.Bitmap
 import android.os.Bundle
-import com.aldebaran.qi.sdk.Qi
+import android.widget.ImageView
+import androidx.core.view.isVisible
 import com.aldebaran.qi.sdk.QiContext
-import com.aldebaran.qi.sdk.QiRobot
 import com.aldebaran.qi.sdk.QiSDK
-import com.aldebaran.qi.sdk.QiThreadPool
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.aldebaran.qi.sdk.`object`.actuation.FreeFrame
 import com.aldebaran.qi.sdk.design.activity.RobotActivity
@@ -16,6 +16,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var baseFrame: FreeFrame
     private lateinit var lookAt: LookAtTarget
     private lateinit var speech: Speech
+    private lateinit var display: Display
     private lateinit var config: Config
     private lateinit var experiment: ExperimentLoader
     private lateinit var experimentHandler: ExperimentHandler
@@ -36,14 +37,17 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     override fun onRobotFocusGained(qiContext: QiContext) {
         // The robot focus is gained.
         if (!init) {
-            initClass = Init(qiContext)
-            initClass.fullInit(this)
             runOnUiThread {
                 setContentView(R.layout.activity_main)
             }
+
+            initClass = Init(qiContext)
+            initClass.fullInit(this)
             init = true
-            val webInterface = Webinterface(8080)
-            experimentHandler = ExperimentHandler(experiment, lookAt, speech)
+
+            val webInterface = Webinterface(config.getElement("port")!!.toInt())
+
+            experimentHandler = ExperimentHandler(experiment, lookAt, speech, display)
 
             webInterface.setExperimentHandler(experimentHandler)
 
@@ -91,5 +95,9 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
     fun setExperiment(experiment: ExperimentLoader) {
         this.experiment = experiment
+    }
+
+    fun setDisplay(display: Display) {
+        this.display = display
     }
 }

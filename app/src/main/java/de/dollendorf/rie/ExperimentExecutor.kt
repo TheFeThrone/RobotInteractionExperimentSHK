@@ -3,7 +3,7 @@ package de.dollendorf.rie
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
 
     override fun run() {
         executeStep()
@@ -72,6 +72,12 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             }
             "reset_look" -> {
                 experimentHandler.cancelMovements()
+            }
+            "display" -> {
+                display.show(value)
+            }
+            "reset_display" -> {
+                display.blank()
             }
             "empty" -> {
 

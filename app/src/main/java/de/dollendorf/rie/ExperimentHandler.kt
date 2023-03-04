@@ -4,7 +4,7 @@ import com.aldebaran.qi.Future
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 
-class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
+class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val display: Display) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
 
     private var steps: List<String>? = null
     private var lookAtFuture: Future<Void>? = null
@@ -41,7 +41,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             }
             afterJump = false
             currentStep = counter
-            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, this, executeAgain))
+            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, display, this, executeAgain))
             executorThread.start()
             executorThread.join()
         }

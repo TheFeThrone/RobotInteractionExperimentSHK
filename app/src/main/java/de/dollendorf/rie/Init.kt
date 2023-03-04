@@ -1,6 +1,7 @@
 package de.dollendorf.rie
 
 import android.content.pm.PackageManager
+import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.aldebaran.qi.sdk.QiContext
@@ -15,6 +16,7 @@ class Init(private val qiContext: QiContext) {
         val baseFrame = qiContext.mapping.makeFreeFrame()
         val robotFrame = qiContext.actuation.robotFrame()
         val transform = TransformBuilder.create().fromTranslation(Vector3(0.0,0.0,0.0))
+        val display = Display(mainActivity.findViewById(R.id.experimentPicture), mainActivity)
         baseFrame.update(robotFrame, transform, 0L)
         if (ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(mainActivity, arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE), 100)
@@ -37,5 +39,6 @@ class Init(private val qiContext: QiContext) {
         }
         mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
+        mainActivity.setDisplay(display)
     }
 }
