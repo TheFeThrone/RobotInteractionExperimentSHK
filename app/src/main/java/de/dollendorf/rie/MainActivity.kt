@@ -16,6 +16,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var baseFrame: FreeFrame
     private lateinit var lookAt: LookAtTarget
     private lateinit var moveTo: MoveToTarget
+    private lateinit var animation: Animation
     private lateinit var speech: Speech
     private lateinit var display: Display
     private lateinit var config: Config
@@ -48,7 +49,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
             val webInterface = Webinterface(config.getElement("port")!!.toInt())
 
-            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, speech, display)
+            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, animation, speech, display)
 
             webInterface.setExperimentHandler(experimentHandler)
 
@@ -103,5 +104,9 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
     fun setMoveTo(moveTo: MoveToTarget) {
         this.moveTo = moveTo
+    }
+
+    fun setAnimation(animation: Animation) {
+        this.animation = animation
     }
 }

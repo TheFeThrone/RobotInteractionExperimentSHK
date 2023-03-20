@@ -3,7 +3,13 @@
 		"name": "Lilly"
 		},
 	"sequence": {
-		"order": "display_1,move_to_1,say_1,say_2,reset_display_1,say_3,look_at_1,say_4,look_at_2,say_5,look_at_1,say_6,look_at_2,say_7,look_at_1,say_8,look_at_2,say_9,say_10",
+		"order": "display_1,move_to_1,animation_1,say_1,say_2,reset_display_1,say_3,look_at_1,say_4,look_at_2,say_5,look_at_1,say_6,look_at_2,say_7,look_at_1,say_8,look_at_2,say_9,say_10",
+		"animation_1": {
+			"friendly_name": "Animation",
+			"value": "show_body_a001",
+			"requires_user_interaction": false,
+			"stopping": true
+		},
 		"move_to_1": {
 			"friendly_name": "Move To",
 			"value": {

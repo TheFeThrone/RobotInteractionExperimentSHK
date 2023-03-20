@@ -2,7 +2,7 @@ package de.dollendorf.rie
 
 import java.lang.Thread.currentThread
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation,  val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
 
     private var interrupted = false
 
@@ -68,10 +68,18 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             "move_to" -> {
                 experimentHandler.cancelMovements()
                 val coordinates = value.replace(Regex("\\{|\\}|x|y|z|:"), "").split(",")
-                val moveToFuture = moveTo.startMoveTo(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())!!
-                experimentHandler.setMoveToFuture(moveToFuture)
+                val moveToFuture = moveTo.startMoveTo(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())
+                experimentHandler.setMoveToFuture(moveToFuture!!)
                 if (stopping) {
                     moveToFuture.sync()
+                }
+            }
+            "animation" -> {
+                experimentHandler.cancelMovements()
+                val animationFuture = animation.startAnimation(value)
+                experimentHandler.setAnimationFuture(animationFuture!!)
+                if (stopping) {
+                    animationFuture.sync()
                 }
             }
             "time" -> {

@@ -44,6 +44,7 @@ class Init(private val qiContext: QiContext) {
         mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
+        mainActivity.setAnimation(Animation(qiContext))
         mainActivity.setDisplay(display)
     }
 }

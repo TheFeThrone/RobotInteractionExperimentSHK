@@ -4,11 +4,12 @@ import com.aldebaran.qi.Future
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 
-class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val speech: Speech, private val display: Display) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
+class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation, private val speech: Speech, private val display: Display) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
 
     private var steps: List<String>? = null
     private var lookAtFuture: Future<Void>? = null
     private var moveToFuture: Future<Void>? = null
+    private var animationFuture: Future<Void>? = null
     private var sayFuture: Future<Void>? = null
     private var currentStep = 0
     private var items: List<String>? = null
@@ -42,7 +43,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             }
             afterJump = false
             currentStep = counter
-            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, moveTo, speech, display, this, executeAgain))
+            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, moveTo, animation, speech, display, this, executeAgain))
             executorThread.start()
             executorThread.join()
         }
@@ -61,6 +62,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     fun cancelMovements() {
         lookAtFuture?.requestCancellation()
         moveToFuture?.requestCancellation()
+        animationFuture?.requestCancellation()
     }
 
     fun cancelSounds() {
@@ -78,6 +80,10 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
 
     fun setMoveToFuture(moveToFuture: Future<Void>) {
         this.moveToFuture = moveToFuture
+    }
+
+    fun setAnimationFuture(animationFuture: Future<Void>) {
+        this.animationFuture = animationFuture
     }
 
     fun getCurrentStep(): Int {
