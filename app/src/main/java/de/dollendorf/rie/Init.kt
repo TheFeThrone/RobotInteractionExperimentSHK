@@ -10,12 +10,16 @@ import com.aldebaran.qi.sdk.`object`.locale.Language
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
 import com.aldebaran.qi.sdk.builder.TransformBuilder
+import kotlin.concurrent.thread
 
 class Init(private val qiContext: QiContext) {
     fun fullInit(mainActivity: MainActivity) {
         val baseFrame = qiContext.mapping.makeFreeFrame()
         val robotFrame = qiContext.actuation.robotFrame()
         val transform = TransformBuilder.create().fromTranslation(Vector3(0.0,0.0,0.0))
+        while (mainActivity.findViewById<ImageView>(R.id.experimentPicture) == null) {
+            Thread.sleep(10)
+        }
         val display = Display(mainActivity.findViewById(R.id.experimentPicture), mainActivity)
         baseFrame.update(robotFrame, transform, 0L)
         if (ContextCompat.checkSelfPermission(mainActivity, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -39,6 +43,7 @@ class Init(private val qiContext: QiContext) {
         }
         mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
+        mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
         mainActivity.setDisplay(display)
     }
 }

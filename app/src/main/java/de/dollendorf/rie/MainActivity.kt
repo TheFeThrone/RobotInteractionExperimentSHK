@@ -15,6 +15,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var initClass: Init
     private lateinit var baseFrame: FreeFrame
     private lateinit var lookAt: LookAtTarget
+    private lateinit var moveTo: MoveToTarget
     private lateinit var speech: Speech
     private lateinit var display: Display
     private lateinit var config: Config
@@ -47,14 +48,13 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
             val webInterface = Webinterface(config.getElement("port")!!.toInt())
 
-            experimentHandler = ExperimentHandler(experiment, lookAt, speech, display)
+            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, speech, display)
 
             webInterface.setExperimentHandler(experimentHandler)
 
             experimentHandler.registerObserver(webInterface)
             webInterface.registerObserver(experimentHandler)
             webInterface.startServer(assets, experiment)
-            qiContext.camera.makeTakePicture(qiContext.robotContext).async()
         } else {
             resume()
         }
@@ -99,5 +99,9 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
     fun setDisplay(display: Display) {
         this.display = display
+    }
+
+    fun setMoveTo(moveTo: MoveToTarget) {
+        this.moveTo = moveTo
     }
 }

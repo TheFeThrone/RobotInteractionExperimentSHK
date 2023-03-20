@@ -1,9 +1,10 @@
 package de.dollendorf.rie
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.jsonObject
+import java.lang.Thread.currentThread
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
+
+    private var interrupted = false
 
     override fun run() {
         executeStep()
@@ -26,19 +27,28 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
         if (requiresUserInteraction) {
             experimentHandler.updateRunningState(2)
             while (experimentHandler.getDecision() == null) {
-                Thread.sleep(100)
+                try {
+                    Thread.sleep(50)
+                }
+                catch (_: InterruptedException) {
+                    interrupted = true
+                }
             }
-            val decision = experimentHandler.getDecision()
-            val possibilities = experiment.getElement("sequence/$currentStepName/possibilities/order")!!.split(",")
-            if (decision!! < possibilities.size) {
-                val currentDecision = possibilities[decision]
-                currentCommand = currentDecision.substringBeforeLast("_")
-                value = experiment.getElement("sequence/$currentStepName/possibilities/$currentDecision/value")
-                stopping = experiment.getElement("sequence/$currentStepName/possibilities/$currentDecision/stopping").toBoolean()
+            if (!currentThread().isInterrupted && !interrupted) {
+                val decision = experimentHandler.getDecision()
+                val possibilities = experiment.getElement("sequence/$currentStepName/possibilities/order")!!.split(",")
+                if (decision!! < possibilities.size) {
+                    val currentDecision = possibilities[decision]
+                    currentCommand = currentDecision.substringBeforeLast("_")
+                    value = experiment.getElement("sequence/$currentStepName/possibilities/$currentDecision/value")
+                    stopping = experiment.getElement("sequence/$currentStepName/possibilities/$currentDecision/stopping").toBoolean()
 
-                experimentHandler.updateExperimentState(ExperimentState(decision, stopping, false))
+                    experimentHandler.updateExperimentState(ExperimentState(decision, stopping, false))
 
-                doStep(currentCommand, value!!, stopping)
+                    doStep(currentCommand, value!!, stopping)
+                }
+            } else {
+                println("Interrupted")
             }
             experimentHandler.updateRunningState(1)
         }
@@ -55,16 +65,29 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                     lookAtFuture?.sync()
                 }*/
             }
+            "move_to" -> {
+                experimentHandler.cancelMovements()
+                val coordinates = value.replace(Regex("\\{|\\}|x|y|z|:"), "").split(",")
+                val moveToFuture = moveTo.startMoveTo(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())!!
+                experimentHandler.setMoveToFuture(moveToFuture)
+                if (stopping) {
+                    moveToFuture.sync()
+                }
+            }
             "time" -> {
                 try {
                     Thread.sleep(value.toLong())
                 }
-                catch (_: InterruptedException) {}
+                catch (_: InterruptedException) {
+                    interrupted = true
+                }
             }
             "say" -> {
+                experimentHandler.cancelSounds()
                 val sayFuture = speech.say(value)
+                experimentHandler.setSayFuture(sayFuture!!)
                 if (stopping) {
-                    sayFuture?.sync()
+                    sayFuture.sync()
                 }
             }
             "sound" -> {

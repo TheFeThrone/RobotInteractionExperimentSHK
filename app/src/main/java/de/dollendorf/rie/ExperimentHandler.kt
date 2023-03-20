@@ -4,10 +4,11 @@ import com.aldebaran.qi.Future
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 
-class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val speech: Speech, private val display: Display) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
+class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val speech: Speech, private val display: Display) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
 
     private var steps: List<String>? = null
     private var lookAtFuture: Future<Void>? = null
+    private var moveToFuture: Future<Void>? = null
     private var sayFuture: Future<Void>? = null
     private var currentStep = 0
     private var items: List<String>? = null
@@ -27,7 +28,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
     private fun startExperiment() {
 
         runningState = 1
-        updateRunningState(runningState)
+        updateRunningState(1)
 
         steps = experiment.getElement("sequence/order")?.split(",")
 
@@ -41,7 +42,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             }
             afterJump = false
             currentStep = counter
-            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, speech, display, this, executeAgain))
+            executorThread = Thread(ExperimentExecutor(currentStep, steps!!, experiment, lookAt, moveTo, speech, display, this, executeAgain))
             executorThread.start()
             executorThread.join()
         }
@@ -59,10 +60,24 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
 
     fun cancelMovements() {
         lookAtFuture?.requestCancellation()
+        moveToFuture?.requestCancellation()
+    }
+
+    fun cancelSounds() {
+        sayFuture?.requestCancellation()
+        sayFuture?.sync()
+    }
+
+    fun setSayFuture(sayFuture: Future<Void>) {
+        this.sayFuture = sayFuture
     }
 
     fun setLookAtFuture(lookAtFuture: Future<Void>) {
         this.lookAtFuture = lookAtFuture
+    }
+
+    fun setMoveToFuture(moveToFuture: Future<Void>) {
+        this.moveToFuture = moveToFuture
     }
 
     fun getCurrentStep(): Int {
@@ -85,7 +100,10 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             "jumpto" -> {
                 try {
                     interrupt = true
+                    cancelSounds()
+                    cancelMovements()
                     executorThread.interrupt()
+                    executorThread.join()
                 } finally {
                     currentStep = json["value"].toString().toInt()
                     thread = Thread(this)
@@ -97,7 +115,6 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
                 val possibilities = experiment.getElement("sequence/${steps?.get(currentStep)}/possibilities/order")!!.split(",")
                 val jump = experiment.getElement("sequence/${steps?.get(currentStep)}/possibilities/${possibilities[decision!!]}/jump")
                 if (jump != null && jump != "") {
-                    println("Jumping after decision")
                     interrupt = true
                     executorThread.join()
                     currentStep = steps!!.indexOf(jump.substringBeforeLast(","))
