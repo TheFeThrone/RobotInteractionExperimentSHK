@@ -1,7 +1,12 @@
 var vm = new Vue({
   el: '#app',
   data: {
-    config: null
+    config: {
+        "experiment": "experiment.json",
+        "language": "de_DE",
+        "speech_speed": 75,
+        "speech_pitch": 80
+    }
   },
   methods: {
     loadConfig: async function() {

@@ -133,7 +133,6 @@ var vm = new Vue({
     },
     init: function() {
         this.connection = new WebSocket("ws://" + location.host + "/websocket");
-
         this.connection.onmessage = (event) => {
         console.log(event.data);
             if (event.data.startsWith("new-state")) {

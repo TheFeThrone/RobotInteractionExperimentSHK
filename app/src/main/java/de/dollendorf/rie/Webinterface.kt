@@ -1,6 +1,8 @@
 package de.dollendorf.rie
 
 import android.content.res.AssetManager
+import android.os.Environment
+import android.provider.ContactsContract.Directory
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
@@ -16,6 +18,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.File
+import java.io.FileNotFoundException
+import java.nio.charset.Charset
 
 class Webinterface(private val config: Config) : ExperimentController(), ExperimentObserverInterface {
 
@@ -48,6 +53,28 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                 get("/data") {
                     call.respondText(experimentLoader.getFullData())
                 }
+                get("/experiment") {
+                    try {
+                        val response = File("${Environment.getExternalStorageDirectory()}/RIE/${call.request.queryParameters["name"]}").readText(Charset.defaultCharset())
+                        call.respondText(response)
+                    } catch (e: FileNotFoundException) {
+                        call.respond(404)
+                    }
+                }
+                get("/experiments") {
+                    val experiments = File("${Environment.getExternalStorageDirectory()}/RIE/").listFiles()
+                    var list = ""
+                    for (experiment in experiments!!) {
+                        if (!experiment.isDirectory && experiment.name != "config.json") {
+                            list = if (list == "") {
+                                experiment.name
+                            } else {
+                                "$list,${experiment.name}"
+                            }
+                        }
+                    }
+                    call.respondText(list)
+                }
                 get("/currentstate") {
                     call.respondText(experimentHandler.getRunningState().toString())
                 }
@@ -63,6 +90,9 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                 }
                 get("/js/config.js") {
                     call.respondText(assets.open("webinterface/js/config.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/experiment.js") {
+                    call.respondText(assets.open("webinterface/js/experiment.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
                 }
                 webSocket("/websocket") {
                     try {

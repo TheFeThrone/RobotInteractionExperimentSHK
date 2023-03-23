@@ -13,8 +13,8 @@
         <a href="config.html">Configuration</a>
     </div>
     <div id="app">
-        <parent v-bind:connection="connection" v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:decision-state="decisionState" v-bind:current-state="currentState"></parent>
+        <state v-bind:state="state" v-bind:experiments="experiments" v-bind:current-experiment="currentExperiment" v-bind:current-block="currentBlock"></state>
     </div>
-    <script src="/js/vue.js"></script>
+    <script src="/js/experiment.js"></script>
 </body>
 </html>
