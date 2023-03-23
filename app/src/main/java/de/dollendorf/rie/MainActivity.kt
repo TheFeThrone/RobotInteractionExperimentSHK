@@ -47,7 +47,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             initClass.fullInit(this)
             init = true
 
-            val webInterface = Webinterface(config.getElement("port")!!.toInt())
+            val webInterface = Webinterface(config)
 
             experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, animation, speech, display)
 

@@ -13,8 +13,28 @@
         <a class="active" href="#">Configuration</a>
     </div>
     <div id="app">
-        <parent v-bind:connection="connection" v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:decision-state="decisionState" v-bind:current-state="currentState"></parent>
+        <div class="two-element-container">
+            <div>
+                <label for="language">Language</label><br>
+                <select id="language" class="select" v-model="config.language">
+                    <option value="de_DE">Deutsch</option>
+                    <option value="en_US">English</option>
+                </select>
+            </div>
+            <div>
+                <label for="port">Webinterface Port</label><br>
+                <input type="number" id="port" class="number" min="0" max="65535" v-model="config.port">
+            </div>
+            <div>
+                <label for="speed">Speech Speed: {{config.speech_speed}}</label><br>
+                <input type="range" id="speed" class="slider" min="50" max="400" step="5" v-model="config.speech_speed">
+            </div>
+            <div>
+                <label for="pitch">Speech Pitch: {{config.speech_pitch}}</label><br>
+                <input type="range" id="pitch" class="slider" min="50" max="400" step="5" v-model="config.speech_pitch">
+            </div>
+        </div>
     </div>
-    <script src="/js/vue.js"></script>
+    <script src="/js/config.js"></script>
 </body>
 </html>

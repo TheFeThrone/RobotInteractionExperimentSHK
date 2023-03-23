@@ -5,6 +5,7 @@ import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
@@ -16,14 +17,14 @@ import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class Webinterface(private val port: Int) : ExperimentController(), ExperimentObserverInterface {
+class Webinterface(private val config: Config) : ExperimentController(), ExperimentObserverInterface {
 
     private val sessions = ArrayList<WebSocketServerSession>()
     private lateinit var experimentHandler: ExperimentHandler
 
     fun startServer(assets: AssetManager, experimentLoader: ExperimentLoader) {
 
-        val server = embeddedServer(Netty, port) {
+        val server = embeddedServer(Netty, config.getElement("port")!!.toInt()) {
             install(WebSockets)
             routing {
                 get("/") {
@@ -49,6 +50,19 @@ class Webinterface(private val port: Int) : ExperimentController(), ExperimentOb
                 }
                 get("/currentstate") {
                     call.respondText(experimentHandler.getRunningState().toString())
+                }
+                get("/config") {
+                    call.respondText(config.getFullData())
+                }
+                put("/config") {
+                    val newValue = call.receiveText()
+                    if (config.getFullData().replace(Regex(" |\n"), "") != newValue) {
+                        config.writeData(newValue)
+                    }
+                    call.respondText(config.getFullData())
+                }
+                get("/js/config.js") {
+                    call.respondText(assets.open("webinterface/js/config.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
                 }
                 webSocket("/websocket") {
                     try {

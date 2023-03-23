@@ -16,7 +16,7 @@ class Config(path: String) : JsonLoader(path) {
     }
 
     private fun loadDefaults() {
-        val config = Json.parseToJsonElement("""{"experiment": "experiment.json", "language": "de_DE"}""")
+        val config = Json.parseToJsonElement("""{"experiment": "experiment.json", "language": "de_DE", "port": 8080, "speech_speed": 75, "speech_pitch": 80}""")
         super.writeData(config.toString())
     }
 }
