@@ -44,6 +44,7 @@ open class JsonLoader(path: String) {
             file.createNewFile()
         }
         file.writeText(data)
+        fileContent = file.readText(Charset.defaultCharset())
     }
 
     fun getFullData(): String {
