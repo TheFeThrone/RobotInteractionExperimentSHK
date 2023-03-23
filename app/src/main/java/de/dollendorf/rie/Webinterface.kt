@@ -61,6 +61,15 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                         call.respond(404)
                     }
                 }
+                put("/experiment") {
+                    try {
+                        val file = File("${Environment.getExternalStorageDirectory()}/RIE/${call.request.queryParameters["name"]}");
+                        file.writeText(call.receiveText())
+                        call.respondText("Accepted")
+                    } catch (e: FileNotFoundException) {
+                        call.respond(404)
+                    }
+                }
                 get("/experiments") {
                     val experiments = File("${Environment.getExternalStorageDirectory()}/RIE/").listFiles()
                     var list = ""

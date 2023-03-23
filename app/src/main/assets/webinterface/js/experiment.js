@@ -13,7 +13,7 @@ var experiments = {
 
 var experimentEditor = {
     props: ['block', 'currentExperiment'],
-    template: `<button v-if="block != '+'" class="grid-item" @click="buttonClick(block)" :title="currentExperiment.experiment.sequence[block].value">{{currentExperiment.experiment.sequence[block].friendly_name}}</button><button v-else class="grid-item" @click="buttonClick(block)" title="Add block">{{block}}</button>`,
+    template: `<button v-if="block != '+' && block != 'Exit'" class="grid-item" @click="buttonClick(block)" :title="currentExperiment.experiment.sequence[block].value">{{currentExperiment.experiment.sequence[block].friendly_name}}</button><button v-else class="grid-item" @click="buttonClick(block)">{{block}}</button>`,
     methods: {
         buttonClick: (block) => {
             vm.editButtonClick(block);
@@ -24,9 +24,46 @@ var experimentEditor = {
     }
 }
 
+var noInput = {
+    template: '<div></div>'
+}
+
+var textInput = {
+    props: ['currentBlock'],
+    template: '<input type="text" class="text" v-model="currentBlock.value">'
+}
+
+var numberInput = {
+    props: ['currentBlock'],
+    template: '<input type="number" class="number" v-model="currentBlock.value">'
+}
+
+var coordinateInput = {
+    props: ['currentBlock'],
+    template: '<div><input type="number" class="number" v-model="currentBlock.value.x"><input type="number" class="number" v-model="currentBlock.value.y"><input type="number" class="number" v-model="currentBlock.value.z"></div>'
+}
+
+var fileInput = {
+    props: ['currentBlock'],
+    template: ''
+}
+
 var blockEditor = {
     props: ['currentBlock'],
-    template: '<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Empty">Empty</option></select></div><div></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"></div></div>'
+    template: `<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><no-input v-if="currentBlock.friendly_name == 'Reset Display' || currentBlock.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentBlock.friendly_name == 'Say' || currentBlock.friendly_name == 'Empty'" id="input" v-bind:current-block="currentBlock"></text-input><number-input v-else-if="currentBlock.friendly_name == 'Time'" id="input" v-bind:current-block="currentBlock"></number-input><coordinate-input v-else-if="currentBlock.friendly_name == 'Look At Target' || currentBlock.friendly_name == 'Move To'" id="input" v-bind:current-block="currentBlock"></coordinate-input><file-input v-else-if="currentBlock.friendly_name == 'Animation' || currentBlock.friendly_name == 'Display' || currentBlock.friendly_name == 'Sound'" id="input" v-bind:current-block="currentBlock"></file-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"></div><button class="grid-item" @click="buttonClick">Exit</button></div>`,
+    methods: {
+        buttonClick: () => {
+            vm.returnFromBlockEditor();
+        }
+    },
+    components: {
+        "no-input": noInput,
+        "text-input": textInput,
+        "number-input": numberInput,
+        "coordinate-input": coordinateInput,
+        "file-input": fileInput,
+        "vm": vm
+    }
 }
 
 var state = {
@@ -52,8 +89,8 @@ var vm = new Vue({
         name: null,
         friendly_name: null,
         value: null,
-        stopping: null,
-        requires_user_interaction: null,
+        stopping: true,
+        requires_user_interaction: false,
         possibilities: null
     },
     state: 0
@@ -73,16 +110,88 @@ var vm = new Vue({
             this.currentExperiment.experiment = dataResponse;
             this.currentExperiment.order = dataResponse.sequence.order.split(",");
             this.currentExperiment.order.push("+");
+            this.currentExperiment.order.push("Exit");
             this.state = 1;
         } else {
             this.state = 2;
         }
     },
-    editButtonClick(block) {
-        this.currentBlock = this.currentExperiment.experiment.sequence[block];
-        this.currentBlock.name = block;
-        console.log(this.currentBlock);
-        this.state = 3;
+    returnFromBlockEditor: function() {
+        if (this.currentBlock.name == null) {
+            var name = "";
+            switch(this.currentBlock.friendly_name) {
+                case "Animation":
+                name = "animation_";
+                break;
+                case "Display":
+                name = "display_";
+                break;
+                case "Reset Display":
+                name = "reset_display_";
+                break;
+                case "Look At Target":
+                name = "look_at_";
+                break;
+                case "Reset Look At":
+                name = "reset_look_";
+                break;
+                case "Move To":
+                name = "move_to_";
+                break;
+                case "Say":
+                name = "say_";
+                break;
+                case "Sound":
+                name = "sound_";
+                break;
+                case "Time":
+                name = "time_";
+                break;
+                case "Empty":
+                name = "empty_";
+                break;
+                default:
+                name = "empty_";
+            };
+            var counter = 0;
+            for (block of this.currentExperiment.order) {
+                if (block.startsWith(name)) {
+                    counter++;
+                }
+            }
+            this.currentExperiment.experiment.sequence[name + counter] = this.currentBlock;
+            this.currentExperiment.experiment.sequence.order = this.currentExperiment.experiment.sequence.order + "," + name + counter;
+            this.currentExperiment.order.splice(this.currentExperiment.order.length - 2, 0, name + counter);
+        } else {
+            this.currentExperiment.experiment.sequence[this.currentBlock.name] = this.currentBlock;
+        }
+        this.state = 1;
+    },
+    editButtonClick: async function(block) {
+        if (block != "+" && block != "Exit") {
+            this.currentBlock = this.currentExperiment.experiment.sequence[block];
+            this.currentBlock.name = block;
+            this.state = 3;
+        } else if (block == "+") {
+            this.currentBlock = {
+                name: null,
+                friendly_name: null,
+                value: null,
+                stopping: true,
+                requires_user_interaction: false,
+                possibilities: null
+            };
+            this.state = 3;
+        } else if (block == "Exit") {
+            var dataResponse = await fetch("/experiment?name=" + this.currentExperiment.name, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(this.currentExperiment.experiment)
+            });
+            this.state = 0;
+        }
     }
   },
   mounted: function() {

@@ -19,7 +19,7 @@ class Animation(private val qiContext: QiContext) {
 
     fun startAnimation(animation: String): Future<Void>? {
         animationFuture?.requestCancellation()
-        val animationString = File("${Environment.getExternalStorageDirectory()}/RIE/Animations/${animation}.qianim").readText(Charset.defaultCharset())
+        val animationString = File("${Environment.getExternalStorageDirectory()}/RIE/Animations/${animation}").readText(Charset.defaultCharset())
         val animationBuild = AnimationBuilder.with(qiContext).withTexts(animationString).build()
         val animate = AnimateBuilder.with(qiContext).withAnimation(animationBuild).build()
         animationFuture = animate.async().run()
