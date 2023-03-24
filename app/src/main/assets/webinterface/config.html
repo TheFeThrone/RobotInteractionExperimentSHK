@@ -15,6 +15,13 @@
     <div id="app">
         <div class="two-element-container">
             <div>
+                <label for="experiment">Experiment</label><br>
+                <select id="experiment" class="select" v-model="config.experiment">
+                    <option v-for="experiment in experiments" :value="experiment">{{experiment}}</option>
+                </select>
+            </div>
+            <div></div>
+            <div>
                 <label for="language">Language</label><br>
                 <select id="language" class="select" v-model="config.language">
                     <option value="de_DE">Deutsch</option>
