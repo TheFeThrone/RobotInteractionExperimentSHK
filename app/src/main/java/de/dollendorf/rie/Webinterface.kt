@@ -64,25 +64,19 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                 put("/experiment") {
                     try {
                         val file = File("${Environment.getExternalStorageDirectory()}/RIE/${call.request.queryParameters["name"]}");
-                        file.writeText(call.receiveText())
-                        call.respondText("Accepted")
+                        if (file.exists()) {
+                            file.writeText(call.receiveText())
+                        } else {
+                            file.createNewFile()
+                            file.writeText("""{"experiment": {"name": "${call.request.queryParameters["name"]}"},"sequence": {"order": ""}}""")
+                        }
+                        call.respondText(getExperiments())
                     } catch (e: FileNotFoundException) {
                         call.respond(404)
                     }
                 }
                 get("/experiments") {
-                    val experiments = File("${Environment.getExternalStorageDirectory()}/RIE/").listFiles()
-                    var list = ""
-                    for (experiment in experiments!!) {
-                        if (!experiment.isDirectory && experiment.name != "config.json") {
-                            list = if (list == "") {
-                                experiment.name
-                            } else {
-                                "$list,${experiment.name}"
-                            }
-                        }
-                    }
-                    call.respondText(list)
+                    call.respondText(getExperiments())
                 }
                 get("/currentstate") {
                     call.respondText(experimentHandler.getRunningState().toString())
@@ -145,5 +139,20 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
 
     fun setExperimentHandler(experimentHandler: ExperimentHandler) {
         this.experimentHandler = experimentHandler
+    }
+
+    fun getExperiments(): String {
+        val experiments = File("${Environment.getExternalStorageDirectory()}/RIE/").listFiles()
+        var list = ""
+        for (experiment in experiments!!) {
+            if (!experiment.isDirectory && experiment.name != "config.json") {
+                list = if (list == "") {
+                    experiment.name
+                } else {
+                    "$list,${experiment.name}"
+                }
+            }
+        }
+        return list
     }
 }
