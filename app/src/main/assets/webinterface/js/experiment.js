@@ -45,7 +45,22 @@ var coordinateInput = {
 
 var fileInput = {
     props: ['currentBlock'],
-    template: '<div></div>'
+    template: '<div><input type="file" class="file" @change="uploadFile($event)"></div>',
+    methods: {
+        uploadFile: (event) => {
+            vm.file.data = event.target.files[0];
+            if (vm.state == 3) {
+                vm.file.type = vm.getFileType(vm.currentBlock.friendly_name);
+                vm.currentBlock.value = vm.file.data.name;
+            } else if (vm.state == 4) {
+                vm.file.type = vm.getFileType(vm.currentPossibility.friendly_name);
+                vm.currentPossibility.value = vm.file.data.name;
+            }
+        }
+    },
+    components: {
+        "vm": vm
+    }
 }
 
 var newExperiment = {
@@ -70,11 +85,14 @@ var newExperiment = {
 
 var blockEditor = {
     props: ['currentBlock'],
-    template: `<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentBlock.friendly_name == 'Reset Display' || currentBlock.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentBlock.friendly_name == 'Say' || currentBlock.friendly_name == 'Empty'" id="input" v-bind:current-block="currentBlock"></text-input><number-input v-else-if="currentBlock.friendly_name == 'Time'" id="input" v-bind:current-block="currentBlock"></number-input><coordinate-input v-else-if="currentBlock.friendly_name == 'Look At Target' || currentBlock.friendly_name == 'Move To'" id="input" v-bind:current-block="currentBlock"></coordinate-input><file-input v-else-if="currentBlock.friendly_name == 'Animation' || currentBlock.friendly_name == 'Display' || currentBlock.friendly_name == 'Sound'" id="input" v-bind:current-block="currentBlock"></file-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"></div><button v-if="currentBlock.requires_user_interaction && !(typeof possibility === 'string')" v-for="possibility in currentBlock.possibilities" class="grid-item" @click="editPossibility(possibility)">{{possibility.friendly_name}}</button><button v-if="currentBlock.requires_user_interaction" class="grid-item" @click="addPossibility">+</button><button class="grid-item" @click="exitButtonClick">Exit</button></div>`,
+    template: `<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentBlock.friendly_name == 'Reset Display' || currentBlock.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentBlock.friendly_name == 'Say' || currentBlock.friendly_name == 'Empty'" id="input" v-bind:current-block="currentBlock"></text-input><number-input v-else-if="currentBlock.friendly_name == 'Time'" id="input" v-bind:current-block="currentBlock"></number-input><coordinate-input v-else-if="currentBlock.friendly_name == 'Look At Target' || currentBlock.friendly_name == 'Move To'" id="input" v-bind:current-block="currentBlock"></coordinate-input><file-input v-else-if="currentBlock.friendly_name == 'Animation' || currentBlock.friendly_name == 'Display' || currentBlock.friendly_name == 'Sound'" id="input" v-bind:current-block="currentBlock"></file-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"><label for="stopping-checkbox"></label></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" id="interaction-checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"><label for="interaction-checkbox"></label></div><button v-if="currentBlock.requires_user_interaction && !(typeof possibility === 'string')" v-for="possibility in currentBlock.possibilities" class="grid-item" @click="editPossibility(possibility)">{{possibility.friendly_name}}</button><button v-if="currentBlock.requires_user_interaction" class="grid-item" @click="addPossibility">+</button><button class="grid-item" @click="exitButtonClick">Exit</button></div>`,
     methods: {
         exitButtonClick: () => {
             if (vm.currentBlock.friendly_name == null) {
                 vm.currentBlock.friendly_name = "Empty";
+            }
+            if (vm.file.data) {
+                vm.uploadFile();
             }
             vm.returnFromBlockEditor();
         },
@@ -95,11 +113,15 @@ var blockEditor = {
         },
         editPossibility: (possibility) => {
             vm.currentPossibility = possibility;
+            var againBool = true;
+            if (vm.currentPossibility.jump.split(",")[1] == "0") {
+                againBool = false;
+            }
             if (vm.currentPossibility.jump != "") {
                 vm.currentPossibility.jump = {
                     enabled: true,
                     target: vm.currentPossibility.jump.split(",")[0],
-                    again: Boolean(vm.currentPossibility.jump.split(",")[1])
+                    again: againBool
                 };
             } else {
                 vm.currentPossibility.jump = {
@@ -108,8 +130,18 @@ var blockEditor = {
                     again: false
                 };
             }
-
             vm.state = 4;
+        },
+        typeChanged: () => {
+            if (vm.currentBlock.friendly_name == "Look At Target" || vm.currentBlock.friendly_name == "Move To") {
+                vm.currentBlock.value = {
+                    x: null,
+                    y: null,
+                    z: null
+                };
+            } else {
+                vm.currentBlock.value = null;
+            }
         }
     },
     components: {
@@ -124,7 +156,7 @@ var blockEditor = {
 
 var possibilityEditor = {
     props: ['currentPossibility', 'currentExperiment'],
-    template: `<div class="two-element-container"><div><label for="block-type-select">Possibility type</label><br><select class="select" id="block-type-select" v-model="currentPossibility.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentPossibility.friendly_name == 'Reset Display' || currentPossibility.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentPossibility.friendly_name == 'Say' || currentPossibility.friendly_name == 'Empty'" id="input" v-bind:current-block="currentPossibility"></text-input><number-input v-else-if="currentPossibility.friendly_name == 'Time'" id="input" v-bind:current-block="currentPossibility"></number-input><coordinate-input v-else-if="currentPossibility.friendly_name == 'Look At Target' || currentPossibility.friendly_name == 'Move To'" id="input" v-bind:current-block="currentPossibility"></coordinate-input><file-input v-else-if="currentPossibility.friendly_name == 'Animation' || currentPossibility.friendly_name == 'Display' || currentPossibility.friendly_name == 'Sound'" id="input" v-bind:current-block="currentPossibility"></file-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentPossibility.stopping"></div><div><label for="jump-checkbox">Jump after decision</label><br><input type="checkbox" id="jump-checkbox" v-model="currentPossibility.jump.enabled"></div><div v-if="currentPossibility.jump.enabled"><label for="target-block">Target block</label><select id="target-block" class="select" v-model="currentPossibility.jump.target"><option v-for="block in currentExperiment.order" v-if="block !== '+' && block !== 'Exit'" :value="block">{{currentExperiment.experiment.sequence[block].friendly_name}}: {{currentExperiment.experiment.sequence[block].value}}</option></select></div><div v-if="currentPossibility.jump.enabled"><label for="again-checkbox">Execute block again</label><br><input id="again-checkbox" type="checkbox" class="checkbox" v-model="currentPossibility.jump.again"></div><button class="grid-item" @click="exitButtonClick">Exit</button></div>`,
+    template: `<div class="two-element-container"><div><label for="block-type-select">Possibility type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentPossibility.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentPossibility.friendly_name == 'Reset Display' || currentPossibility.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentPossibility.friendly_name == 'Say' || currentPossibility.friendly_name == 'Empty'" id="input" v-bind:current-block="currentPossibility"></text-input><number-input v-else-if="currentPossibility.friendly_name == 'Time'" id="input" v-bind:current-block="currentPossibility"></number-input><coordinate-input v-else-if="currentPossibility.friendly_name == 'Look At Target' || currentPossibility.friendly_name == 'Move To'" id="input" v-bind:current-block="currentPossibility"></coordinate-input><file-input v-else-if="currentPossibility.friendly_name == 'Animation' || currentPossibility.friendly_name == 'Display' || currentPossibility.friendly_name == 'Sound'" id="input" v-bind:current-block="currentPossibility"></file-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentPossibility.stopping"><label for="stopping-checkbox"></label></div><div><label for="jump-checkbox">Jump after decision</label><br><input type="checkbox" class="checkbox" id="jump-checkbox" v-model="currentPossibility.jump.enabled"><label for="jump-checkbox"></label></div><div v-if="currentPossibility.jump.enabled"><label for="target-block">Target block</label><select id="target-block" class="select" v-model="currentPossibility.jump.target"><option v-for="block in currentExperiment.order" v-if="block !== '+' && block !== 'Exit'" :value="block">{{currentExperiment.experiment.sequence[block].friendly_name}}: {{currentExperiment.experiment.sequence[block].value}}</option></select></div><div v-if="currentPossibility.jump.enabled"><label for="again-checkbox">Execute block again</label><br><input id="again-checkbox" type="checkbox" class="checkbox" v-model="currentPossibility.jump.again"><label for="again-checkbox"></label></div><button class="grid-item" @click="exitButtonClick">Exit</button></div>`,
     methods: {
         exitButtonClick: () => {
             if (!vm.currentPossibility.jump.enabled || vm.currentPossibility.jump.target == "") {
@@ -139,7 +171,21 @@ var possibilityEditor = {
             if (vm.currentPossibility.friendly_name == null) {
                 vm.currentPossibility.friendly_name = "Empty";
             }
+            if (vm.file.data) {
+                vm.uploadFile();
+            }
             vm.returnFromPossibilityEditor();
+        },
+        typeChanged: () => {
+            if (vm.currentPossibility.friendly_name == "Look At Target" || vm.currentPossibility.friendly_name == "Move To") {
+                vm.currentPossibility.value = {
+                    x: null,
+                    y: null,
+                    z: null
+                };
+            } else {
+                vm.currentPossibility.value = null;
+            }
         }
     },
     components: {
@@ -189,6 +235,10 @@ var vm = new Vue({
         value: null,
         stopping: true,
         jump: ""
+    },
+    file: {
+        type: null,
+        data: null
     },
     state: 0
   },
@@ -303,6 +353,35 @@ var vm = new Vue({
         this.experiments = dataResponse.split(",");
         this.experiments.push("+");
         this.state = 0;
+    },
+    uploadFile: async function() {
+        var data = new FormData();
+        data.append("file", this.file.data);
+        var dataResponse = await fetch("/file?name=" + this.file.data.name + "&type=" + this.file.type, {
+            method: "PUT",
+            body: data
+        });
+        this.file = {
+            type: null,
+            data: null
+        }
+    },
+    getFileType: function(name) {
+        var type = "";
+        switch(name) {
+            case "Animation":
+                type = "animation";
+            break;
+            case "Display":
+                type = "picture";
+            break;
+            case "Sound":
+                type = "sound"
+            break;
+            default:
+                type = "empty"
+        }
+        return type;
     },
     getBlockName: function(friendly_name, order) {
         var name = "";

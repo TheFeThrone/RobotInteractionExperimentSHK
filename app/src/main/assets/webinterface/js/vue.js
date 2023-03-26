@@ -102,6 +102,7 @@ var vm = new Vue({
             var possibilities = [];
             var possibilitiesJson = this.response.sequence[step].possibilities;
             if (possibilitiesJson) {
+                if (possibilitiesJson.order != "") {
                 possibleSteps = possibilitiesJson.order.split(",");
                 var j = 0;
                 for (possibleStep of possibleSteps) {
@@ -125,6 +126,7 @@ var vm = new Vue({
                     j++;
                 }
                 possibilities.push({index: j, item: "exit", friendlyName: "Return without choice.", value: "", shortValue: ""})
+                }
             }
             newStep = {index: i, item: step, friendlyName: this.response.sequence[step].friendly_name, value: value, shortValue: shortValue, possibilities: possibilities};
             this.steps.push(newStep);

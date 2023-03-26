@@ -4,6 +4,7 @@ import android.content.res.AssetManager
 import android.os.Environment
 import android.provider.ContactsContract.Directory
 import io.ktor.http.*
+import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -68,9 +69,35 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                             file.writeText(call.receiveText())
                         } else {
                             file.createNewFile()
-                            file.writeText("""{"experiment": {"name": "${call.request.queryParameters["name"]}"},"sequence": {"order": ""}}""")
+                            file.writeText("""{"experiment": {"name": "${call.request.queryParameters["name"]}"},"sequence": {"order": "empty_0", "empty_0": {"name": "empty_0", "friendly_name": "Empty", "value": null, "stopping": true, "requires_user_interaction": false, "possibilities": {"order": ""}}}}""")
                         }
                         call.respondText(getExperiments())
+                    } catch (e: FileNotFoundException) {
+                        call.respond(404)
+                    }
+                }
+                put("/file") {
+                    try {
+                        val fileName = call.request.queryParameters["name"]
+                        var type = ""
+                        when(call.request.queryParameters["type"]) {
+                            "animation" -> type = "Animations"
+                            "sound" -> type = "AudioFiles"
+                            "picture" -> type = "Pictures"
+                        }
+                        val multiPart = call.receiveMultipart()
+                        multiPart.forEachPart { part ->
+                            if (part is PartData.FileItem) {
+                                val file = File("${Environment.getExternalStorageDirectory()}/RIE/$type/$fileName")
+                                part.streamProvider().use { its ->
+                                    file.outputStream().buffered().use {
+                                        its.copyTo(it)
+                                    }
+                                }
+                            }
+                            part.dispose()
+                        }
+                        call.respondText("Success")
                     } catch (e: FileNotFoundException) {
                         call.respond(404)
                     }
