@@ -2,7 +2,7 @@ package de.dollendorf.rie
 
 import java.lang.Thread.currentThread
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation,  val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean) : Runnable {
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation,  val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean, private val documentation: Documentation) : Runnable {
 
     private var interrupted = false
 
@@ -55,7 +55,7 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
     }
 
     private fun doStep(currentCommand: String, value: String, stopping: Boolean) {
-        println("Executing $currentCommand with value $value")
+        documentation.addEvent("Executing $currentCommand with value $value")
         when (currentCommand) {
             "look_at" -> {
                 experimentHandler.cancelMovements()
@@ -115,7 +115,6 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             }
             else -> println("Item not found")
         }
-        println("Finished current step")
     }
 
 }

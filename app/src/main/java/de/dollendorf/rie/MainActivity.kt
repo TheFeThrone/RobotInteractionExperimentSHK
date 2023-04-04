@@ -22,6 +22,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var config: Config
     private lateinit var experiment: ExperimentLoader
     private lateinit var experimentHandler: ExperimentHandler
+    private lateinit var documentation: Documentation
     private var init = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
             val webInterface = Webinterface(config)
 
-            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, animation, speech, display)
+            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, animation, speech, display, documentation)
 
             webInterface.setExperimentHandler(experimentHandler)
 
@@ -108,5 +109,9 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
     fun setAnimation(animation: Animation) {
         this.animation = animation
+    }
+
+    fun setDocumentation(documentation: Documentation) {
+        this.documentation = documentation
     }
 }

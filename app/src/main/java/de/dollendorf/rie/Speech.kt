@@ -1,7 +1,6 @@
 package de.dollendorf.rie
 
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Environment
 import com.aldebaran.qi.Future
 import com.aldebaran.qi.sdk.QiContext
@@ -21,13 +20,22 @@ class Speech(private val qiContext: QiContext, private val locale: Locale, priva
     }
 
     fun play(audioPath: String) {
-        val mediaPlayer = MediaPlayer()
-        mediaPlayer.setDataSource("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles/$audioPath")
-        mediaPlayer.prepare()
-        mediaPlayer.start()
-        while (mediaPlayer.isPlaying) {
-            Thread.sleep(50)
+        var success = false
+        var counter = 0
+        while (!success && counter < 3) {
+            try {
+                val mediaPlayer = MediaPlayer()
+                mediaPlayer.setDataSource("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles/$audioPath")
+                mediaPlayer.prepare()
+                mediaPlayer.start()
+                while (mediaPlayer.isPlaying) {
+                    Thread.sleep(50)
+                }
+                mediaPlayer.release()
+                success = true
+            } catch (_: Exception) {
+                counter++
+            }
         }
-        mediaPlayer.release()
     }
 }

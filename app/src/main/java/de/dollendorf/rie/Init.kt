@@ -1,6 +1,7 @@
 package de.dollendorf.rie
 
 import android.content.pm.PackageManager
+import android.os.Environment
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -10,10 +11,20 @@ import com.aldebaran.qi.sdk.`object`.locale.Language
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
 import com.aldebaran.qi.sdk.builder.TransformBuilder
-import kotlin.concurrent.thread
+import java.io.File
 
 class Init(private val qiContext: QiContext) {
     fun fullInit(mainActivity: MainActivity) {
+        if (!File("${Environment.getExternalStorageDirectory()}/RIE/Logs").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Pictures").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Animations").isDirectory) {
+            try {
+                File("${Environment.getExternalStorageDirectory()}/RIE/Animations").mkdirs()
+                File("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles").mkdirs()
+                File("${Environment.getExternalStorageDirectory()}/RIE/Pictures").mkdirs()
+                File("${Environment.getExternalStorageDirectory()}/RIE/Logs").mkdirs()
+            } catch (_: Exception) {
+
+            }
+        }
         val baseFrame = qiContext.mapping.makeFreeFrame()
         val robotFrame = qiContext.actuation.robotFrame()
         val transform = TransformBuilder.create().fromTranslation(Vector3(0.0,0.0,0.0))
@@ -46,5 +57,6 @@ class Init(private val qiContext: QiContext) {
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
         mainActivity.setAnimation(Animation(qiContext))
         mainActivity.setDisplay(display)
+        mainActivity.setDocumentation(Documentation(experimentFile))
     }
 }
