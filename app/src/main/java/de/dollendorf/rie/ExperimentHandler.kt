@@ -51,6 +51,11 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
             documentation.createFile()
             updateRunningState(3)
             display.blank()
+            moveToFuture = moveTo.startMoveTo(0.0, 0.0, 0.0)
+            lookAtFuture = lookAt.startLookAt(10.0, 0.0, 1.2)
+            moveToFuture?.sync()
+            Thread.sleep(500)
+            cancelMovements()
         }
     }
 
