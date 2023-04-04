@@ -18,12 +18,12 @@ class Documentation(private val experimentFile: String) {
         currentFile = file.name
         file.writeText(events)
         events = ""
-        currentFile = ""
     }
 
     fun addEvent(event: String) {
         val currentTime = logDateFormat.format(Date())
         events = if (events == "") {
+            currentFile = ""
             "[$currentTime] \"$event\""
         } else {
             "$events\n[$currentTime] \"$event\""

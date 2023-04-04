@@ -105,6 +105,8 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
         when (json["type"].toString()) {
             "start" -> {
                 currentStep = 0
+                runningState = 0
+                thread = Thread(this)
                 thread.start()
             }
             "jumpto" -> {
