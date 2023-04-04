@@ -71,7 +71,9 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                 val moveToFuture = moveTo.startMoveTo(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())
                 experimentHandler.setMoveToFuture(moveToFuture!!)
                 if (stopping) {
-                    moveToFuture.sync()
+                    while (!moveToFuture.isDone) {
+                        Thread.sleep(50)
+                    }
                 }
             }
             "animation" -> {
