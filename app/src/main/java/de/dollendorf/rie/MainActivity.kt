@@ -56,7 +56,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
 
             experimentHandler.registerObserver(webInterface)
             webInterface.registerObserver(experimentHandler)
-            webInterface.startServer(assets, experiment)
+            webInterface.startServer(assets, experiment, documentation)
         } else {
             resume()
         }

@@ -57,6 +57,6 @@ class Init(private val qiContext: QiContext) {
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
         mainActivity.setAnimation(Animation(qiContext))
         mainActivity.setDisplay(display)
-        mainActivity.setDocumentation(Documentation(experimentFile))
+        mainActivity.setDocumentation(Documentation(experimentFile!!))
     }
 }

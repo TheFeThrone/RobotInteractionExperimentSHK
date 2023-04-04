@@ -28,7 +28,7 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
     private val sessions = ArrayList<WebSocketServerSession>()
     private lateinit var experimentHandler: ExperimentHandler
 
-    fun startServer(assets: AssetManager, experimentLoader: ExperimentLoader) {
+    fun startServer(assets: AssetManager, experimentLoader: ExperimentLoader, documentation: Documentation) {
 
         val server = embeddedServer(Netty, config.getElement("port")!!.toInt()) {
             install(WebSockets)
@@ -110,6 +110,16 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                 }
                 get("/config") {
                     call.respondText(config.getFullData())
+                }
+                get("/log") {
+                    call.respondFile(File("${Environment.getExternalStorageDirectory()}/RIE/Logs/${documentation.getCurrentFileName()}"))
+                }
+                get("/logname") {
+                    call.respondText(documentation.getCurrentFileName())
+                }
+                get("/restart") {
+                    call.respondText("Ok")
+                    updateRunningState(0)
                 }
                 put("/config") {
                     val newValue = call.receiveText()

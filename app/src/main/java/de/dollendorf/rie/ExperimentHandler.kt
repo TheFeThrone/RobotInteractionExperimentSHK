@@ -49,6 +49,7 @@ class ExperimentHandler(private val experiment: ExperimentLoader, private val lo
         }
         if (!interrupt) {
             documentation.createFile()
+            updateRunningState(3)
         }
     }
 

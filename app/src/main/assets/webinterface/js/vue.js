@@ -136,13 +136,28 @@ var vm = new Vue({
     init: function() {
         this.connection = new WebSocket("ws://" + location.host + "/websocket");
         this.connection.onmessage = (event) => {
-        console.log(event.data);
+            console.log(event.data);
             if (event.data.startsWith("new-state")) {
                 this.currentState = event.data.split(" ")[1];
                 if (this.currentState == 1) {
                     this.experimentState = {index: null};
                 } else if (this.currentState == 2) {
                     this.decisionState = {index: null};
+                } else if (this.currentState == 3) {
+                    var logName = "";
+                    fetch("/logname").then(res => res.text()).then(res => {
+                        logName = res;
+                    });
+                    fetch("/log", {method: 'get', mode: 'no-cors', referrerPolicy: 'no-referrer'}).then(res => res.blob()).then(res => {
+                          const aElement = document.createElement('a');
+                          aElement.setAttribute('download', logName);
+                          const href = URL.createObjectURL(res);
+                          aElement.href = href;
+                          aElement.setAttribute('target', '_blank');
+                          aElement.click();
+                          URL.revokeObjectURL(href);
+                        });
+                    fetch("/restart");
                 }
             } else {
                 if (this.currentState == 1) {
