@@ -55,7 +55,7 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
     }
 
     private fun doStep(currentCommand: String, value: String, stopping: Boolean) {
-        documentation.addEvent("Executing $currentCommand with value $value")
+        documentation.addEvent("Executing $currentCommand with value \"$value\"")
         when (currentCommand) {
             "look_at" -> {
                 experimentHandler.cancelMovements()

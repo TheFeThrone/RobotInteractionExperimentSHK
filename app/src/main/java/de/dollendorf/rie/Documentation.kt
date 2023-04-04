@@ -24,9 +24,9 @@ class Documentation(private val experimentFile: String) {
         val currentTime = logDateFormat.format(Date())
         events = if (events == "") {
             currentFile = ""
-            "[$currentTime] \"$event\""
+            "[$currentTime] $event"
         } else {
-            "$events\n[$currentTime] \"$event\""
+            "$events\n[$currentTime] $event"
         }
     }
 
