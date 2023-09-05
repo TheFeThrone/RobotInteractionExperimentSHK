@@ -10,12 +10,16 @@ We have to handle all incoming tcp connections to our host and pass them through
    - This will be the port of the emulator 
 2. Open terminal on pc
 3. ``telnet localhost <emulator build number>``
-4. ``redir add tcp:8080:8080``  
+4. Enter the needed authentication token wit ``auth <auth_token>``
+   - Your terminal will tell you where to find it
+   - Should be in: ``/home/<user>/.emulator_console_auth_token``
+   - Type ``cat /home/<user>/.emulator_console_auth_token`` in another terminal to show your key
+5. ``redir add tcp:8080:8080``  
    - The first 8080 is the port we will visit from our host  
    - The second 8080 is the port we are emulating in the emulator
-5. Now you can run the app in Android Studio 
+6. Now you can run the app in Android Studio 
    - Be sure that you have selected the right Emulator to run in and have selected **app** to be run
-6. Visit http://localhost:8080
+7. Visit http://localhost:8080
 
 ## Extra info
 
