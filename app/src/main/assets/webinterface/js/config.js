@@ -13,13 +13,16 @@ var vm = new Vue({
     loadConfig: async function() {
         var dataResponse = await fetch("/config");
         this.config = await dataResponse.json();
-        dataResponse = await fetch("/experiments");
+    },
+    loadExperiments: async function() {
+        var dataResponse = await fetch("/experiments");
         dataResponse = await dataResponse.text();
         this.experiments = dataResponse.split(",");
     }
   },
   mounted: function() {
     this.loadConfig();
+    this.loadExperiments();
   },
   components: {
 
