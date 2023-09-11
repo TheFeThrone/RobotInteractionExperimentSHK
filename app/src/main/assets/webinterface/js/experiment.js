@@ -1,9 +1,12 @@
 var experiments = {
     props: ['experiment'],
-    template: '<button class="grid-item" @click="buttonClick(experiment)">{{experiment}}</button>',
+    template: '<button class="grid-item" @click="buttonClick(experiment)" @contextmenu.prevent="handler(experiment)">{{experiment}}</button>',
     methods: {
         buttonClick: (experiment) => {
             vm.experimentButtonClick(experiment);
+        },
+        handler: function(experiment) {
+            vm.deleteExperiment(experiment);
         }
     },
     components: {
@@ -13,11 +16,11 @@ var experiments = {
 
 var experimentEditor = {
     props: ['block', 'currentExperiment'],
-    template: `<button v-if="block !== '+' && block !== 'Save & Exit'" class="grid-item" @click="buttonClick(block)" :title="currentExperiment.experiment.sequence[block].value">{{currentExperiment.experiment.sequence[block].friendly_name}}</button><button v-else class="grid-item" @click="buttonClick(block)">{{block}}</button>`,
+    template: `<button v-if="block !== '+' && block !== 'Save & Exit'" class="grid-item" @click="buttonClick(block)" :title="currentExperiment.experiment.sequence[block].value">{{currentExperiment.experiment.sequence[block].friendly_name}}</button><br><button v-else class="grid-item" @click="buttonClick(block)">{{block}}</button>`,
     methods: {
         buttonClick: (block) => {
             vm.editButtonClick(block);
-        }
+        },
     },
     components: {
         "vm": vm
@@ -202,11 +205,11 @@ var state = {
     props: ['state', 'experiments', 'currentExperiment', 'currentBlock', 'currentPossibility'],
     template: '<div v-if="state == 0" class="grid-container"><experiments v-for="experiment in experiments" v-bind:experiment="experiment"></experiments></div><div v-else-if="state == 1" class="grid-container"><experiment-editor v-for="block in currentExperiment.order" v-bind:current-experiment="currentExperiment" v-bind:block="block"></experiment-editor></div><new-experiment v-else-if="state == 2"></new-experiment><block-editor v-else-if="state == 3" v-bind:current-block="currentBlock"></block-editor><possibility-editor v-else-if="state == 4" v-bind:current-possibility="currentPossibility" v-bind:current-experiment="currentExperiment"></possibility-editor>',
     components: {
-        "experiments": experiments,
-        "new-experiment": newExperiment,
-        "experiment-editor": experimentEditor,
-        "block-editor": blockEditor,
-        "possibility-editor": possibilityEditor
+        "experiments": experiments,             //0
+        "new-experiment": newExperiment,        //2
+        "experiment-editor": experimentEditor,  //1
+        "block-editor": blockEditor,            //3
+        "possibility-editor": possibilityEditor //4
     }
 }
 
@@ -226,7 +229,7 @@ var vm = new Vue({
         stopping: true,
         requires_user_interaction: false,
         possibilities: {
-            order: ""
+            order: null
         }
     },
     currentPossibility: {
@@ -326,7 +329,7 @@ var vm = new Vue({
                 stopping: true,
                 requires_user_interaction: false,
                 possibilities: {
-                    order: ""
+                    order: null
                 }
             };
             this.state = 3;
@@ -338,6 +341,9 @@ var vm = new Vue({
                 },
                 body: JSON.stringify(this.currentExperiment.experiment)
             });
+            this.state = 0;
+        } else if (block == "Delete") {
+            this.deleteExperiment(this.currentExperiment.name);
             this.state = 0;
         }
     },
@@ -353,6 +359,23 @@ var vm = new Vue({
         this.experiments = dataResponse.split(",");
         this.experiments.push("+");
         this.state = 0;
+    },
+    deleteExperiment: async function(experimentName){
+        const confirmed = confirm(`Are you sure you want to delete the experiment "${experimentName}"?`);
+        if (confirmed) {
+          // Send a DELETE request to your server to delete the experiment
+          try {
+            await fetch(`/experiment?name=${experimentName}`, {
+              method: 'DELETE',
+            });
+            // Update the UI to remove the experiment from the list
+            this.experiments = this.experiments.filter(experiment => experiment !== experimentName);
+            alert(`Experiment "${experimentName}" has been deleted.`);
+          } catch (error) {
+            console.error('Error deleting experiment:', error);
+            alert(`Error deleting experiment "${experimentName}".`);
+          }
+        }
     },
     uploadFile: async function() {
         var data = new FormData();
@@ -425,7 +448,8 @@ var vm = new Vue({
                 counter++;
             }
         }
-        return name + counter;
+        var countedName = name + counter;
+        return countedName;
     }
   },
   mounted: function() {

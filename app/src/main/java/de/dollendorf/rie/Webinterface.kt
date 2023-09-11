@@ -64,7 +64,7 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                 }
                 put("/experiment") {
                     try {
-                        val file = File("${Environment.getExternalStorageDirectory()}/RIE/${call.request.queryParameters["name"]}");
+                        val file = File("${Environment.getExternalStorageDirectory()}/RIE/${call.request.queryParameters["name"]}")
                         if (file.exists()) {
                             file.writeText(call.receiveText())
                         } else {
@@ -74,6 +74,21 @@ class Webinterface(private val config: Config) : ExperimentController(), Experim
                         call.respondText(getExperiments())
                     } catch (e: FileNotFoundException) {
                         call.respond(404)
+                    }
+                }
+                delete("/experiment") {
+                    try {
+                        val experimentName = call.request.queryParameters["name"]
+                        val experimentFile = File("${Environment.getExternalStorageDirectory()}/RIE/$experimentName")
+
+                        if (experimentFile.exists()) {
+                            experimentFile.delete()
+                            call.respondText("Experiment '$experimentName' has been deleted.")
+                        } else {
+                            call.respondText("Experiment '$experimentName' not found.", status = HttpStatusCode.NotFound)
+                        }
+                    } catch (e: Exception) {
+                        call.respondText("Error deleting experiment: ${e.message}", status = HttpStatusCode.InternalServerError)
                     }
                 }
                 put("/file") {
