@@ -5,7 +5,8 @@ body {
 .grid-container {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-auto-rows: auto; /* allow the grid elements to change size on hover. set height of grid-item to 100px instead */
+    /* grid-auto-rows: auto; /* allow the grid elements to change size on hover. set height of grid-item to 100px instead */*/
+    grid-auto-rows: 100px;
     grid-gap: 20px;
     margin: 1% 5% 1%;
 }
@@ -43,7 +44,7 @@ body {
     font-size: 20px;
     transition-duration: 0.5s;
     overflow: hidden; /* hides text if overflow */
-    height: 100px; /* sets standard size of the grid element to 100px. min-height didnt work to change the size on hover */
+    /* height: 100px; /* sets standard size of the grid element to 100px. min-height didnt work to change the size on hover */
 }
 
 .slider {
@@ -160,12 +161,12 @@ input[type="checkbox"]:checked + label:before {
 }
 
 .grid-item:hover, .grid-item.active:hover, .start-experiment:hover {
-    position: relative;
+    /* position: relative;*/
     border-color: #8dae10;
     color: #8dae10;
     background-color: #17365c;
     transition-duration: 0.5s;
-    min-height: 100px;
+    /*min-height: 100px;
     height: auto; /* change size to fit the text inside on hover */
 }
 
@@ -224,3 +225,4 @@ input[type="checkbox"]:checked + label:before {
     background-color: #8dae10;
     color: white;
 }
+

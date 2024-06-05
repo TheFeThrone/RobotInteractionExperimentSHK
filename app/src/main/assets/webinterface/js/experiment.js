@@ -20,7 +20,7 @@ var experimentEditor = {
     methods: {
         buttonClick: (block) => {
             vm.editButtonClick(block);
-        },
+        }
     },
     components: {
         "vm": vm
@@ -101,6 +101,8 @@ var blockEditor = {
         },
         addPossibility: () => {
             vm.setBlockName();
+
+            // Create new possibilty object
             vm.currentPossibility = {
                 name: null,
                 friendly_name: null,
@@ -112,6 +114,7 @@ var blockEditor = {
                     again: false
                 }
             }
+            // Transition to the state for editing the new possibility
             vm.state = 4;
         },
         editPossibility: (possibility) => {
@@ -229,7 +232,7 @@ var vm = new Vue({
         stopping: true,
         requires_user_interaction: false,
         possibilities: {
-            order: null
+            order: ""
         }
     },
     currentPossibility: {
@@ -329,7 +332,7 @@ var vm = new Vue({
                 stopping: true,
                 requires_user_interaction: false,
                 possibilities: {
-                    order: null
+                    order: ""
                 }
             };
             this.state = 3;
