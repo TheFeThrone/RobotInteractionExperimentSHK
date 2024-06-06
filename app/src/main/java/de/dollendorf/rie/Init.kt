@@ -7,13 +7,18 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.`object`.geometry.Vector3
+import com.aldebaran.qi.sdk.`object`.holder.Holder
 import com.aldebaran.qi.sdk.`object`.locale.Language
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
 import com.aldebaran.qi.sdk.builder.TransformBuilder
 import java.io.File
 
+
 class Init(private val qiContext: QiContext) {
+
+    private lateinit var holder: Holder
+
     fun fullInit(mainActivity: MainActivity) {
         if (!File("${Environment.getExternalStorageDirectory()}/RIE/Logs").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Pictures").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Animations").isDirectory) {
             try {
@@ -52,6 +57,10 @@ class Init(private val qiContext: QiContext) {
         } else {
             Locale(Language.ENGLISH, Region.UNITED_STATES)
         }
+
+        val autonomousAbilitiesBoolean = config.getElement("autonomous_activity").toBoolean()
+        AutonomousAbilitiesToggle().toggleAutonomousAbilities(autonomousAbilitiesBoolean, qiContext, holder)
+
         mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
