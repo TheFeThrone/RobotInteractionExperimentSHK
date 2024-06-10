@@ -211,7 +211,7 @@ var possibilityEditor = {
         "number-input": numberInput,
         "coordinate-input": coordinateInput,
         "file-input": fileInput,
-        "select-input": select,
+        "select-input": selectInput,
         "vm": vm
     }
 }
