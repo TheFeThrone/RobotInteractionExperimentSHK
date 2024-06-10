@@ -7,6 +7,7 @@ import com.aldebaran.qi.sdk.builder.HolderBuilder
 import com.aldebaran.qi.sdk.`object`.autonomousabilities.AutonomousAbilities
 import com.aldebaran.qi.sdk.`object`.autonomousabilities.AutonomousAbilityHolder
 import com.aldebaran.qi.sdk.`object`.autonomousabilities.DegreeOfFreedom
+import com.aldebaran.qi.sdk.`object`.humanawareness.HumanAwareness
 
 class AutonomousAbilitiesToggle  {
     /*
@@ -28,11 +29,18 @@ class AutonomousAbilitiesToggle  {
         // Hold the abilities asynchronously.
         holder.async().hold()
 
+        // Get the HumanAwareness service and Kill
+        val humanAwareness: HumanAwareness = qiContext.humanAwareness
+        humanAwareness?.removeAllOnHumansAroundChangedListeners()
+
+    }
+    fun toggleAutonomousAbilities(qiContext: QiContext) {
+        holdAbilities(qiContext)
     }
 
-    /*
+/*
     To release autonomous abilities asynchronously, call the async and release methods on the corresponding Holder instance.
-    */
+
     private fun releaseAbilities(holder: Holder?) {
         // Release the holder asynchronously.
         holder?.async()?.release()
@@ -40,10 +48,11 @@ class AutonomousAbilitiesToggle  {
 
     fun toggleAutonomousAbilities(autonomous: Boolean, qiContext: QiContext, holder: Holder?) {
 
-        if (!autonomous) {
+        if (autonomous) {
             holder?.let { releaseAbilities(it) }
         } else {
             holdAbilities(qiContext)
         }
     }
+ */
 }
