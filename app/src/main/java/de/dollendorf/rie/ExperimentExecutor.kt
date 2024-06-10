@@ -116,6 +116,14 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             "reset_display" -> {
                 display.blank()
             }
+            "point_at" -> {
+                experimentHandler.cancelMovements()
+                val animationFuture = animation.startAnimation(value)
+                experimentHandler.setAnimationFuture(animationFuture!!)
+                if (stopping) {
+                    animationFuture.sync()
+                }
+            }
             "empty" -> {
 
             }
