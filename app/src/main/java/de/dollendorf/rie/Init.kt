@@ -32,6 +32,7 @@ class Init(private val qiContext: QiContext) {
         }
         val baseFrame = qiContext.mapping.makeFreeFrame()
         val robotFrame = qiContext.actuation.robotFrame()
+
         val transform = TransformBuilder.create().fromTranslation(Vector3(0.0,0.0,0.0))
         while (mainActivity.findViewById<ImageView>(R.id.experimentPicture) == null) {
             Thread.sleep(10)
@@ -61,8 +62,8 @@ class Init(private val qiContext: QiContext) {
         val autonomousAbilitiesBoolean = config.getElement("autonomous_activity").toBoolean()
         AutonomousAbilitiesToggle().toggleAutonomousAbilities(autonomousAbilitiesBoolean, qiContext, holder)
 
-        mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
-        mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
+        mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt(),autonomousAbilitiesBoolean))
+        mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame, autonomousAbilitiesBoolean))
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
         mainActivity.setAnimation(Animation(qiContext))
         mainActivity.setDisplay(display)

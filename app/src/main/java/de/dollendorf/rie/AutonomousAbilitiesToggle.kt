@@ -4,6 +4,9 @@ import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.`object`.holder.AutonomousAbilitiesType
 import com.aldebaran.qi.sdk.`object`.holder.Holder
 import com.aldebaran.qi.sdk.builder.HolderBuilder
+import com.aldebaran.qi.sdk.`object`.autonomousabilities.AutonomousAbilities
+import com.aldebaran.qi.sdk.`object`.autonomousabilities.AutonomousAbilityHolder
+import com.aldebaran.qi.sdk.`object`.autonomousabilities.DegreeOfFreedom
 
 class AutonomousAbilitiesToggle  {
     /*
@@ -17,22 +20,25 @@ class AutonomousAbilitiesToggle  {
                 AutonomousAbilitiesType.BACKGROUND_MOVEMENT,
                 AutonomousAbilitiesType.BASIC_AWARENESS,
                 AutonomousAbilitiesType.AUTONOMOUS_BLINKING
+            ).withDegreesOfFreedom(
+                DegreeOfFreedom.ROBOT_FRAME_ROTATION
             )
             .build()
 
         // Hold the abilities asynchronously.
         holder.async().hold()
+
     }
 
     /*
     To release autonomous abilities asynchronously, call the async and release methods on the corresponding Holder instance.
     */
-    private fun releaseAbilities(holder: Holder) {
+    private fun releaseAbilities(holder: Holder?) {
         // Release the holder asynchronously.
-        holder.async().release()
+        holder?.async()?.release()
     }
 
-    fun toggleAutonomousAbilities(autonomous: Boolean, qiContext: QiContext, holder: Holder) {
+    fun toggleAutonomousAbilities(autonomous: Boolean, qiContext: QiContext, holder: Holder?) {
 
         if (!autonomous) {
             holder?.let { releaseAbilities(it) }

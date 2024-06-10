@@ -2,7 +2,7 @@ package de.dollendorf.rie
 
 import java.lang.Thread.currentThread
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation,  val speech: Speech, private val display: Display, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean, private val documentation: Documentation) : Runnable {
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation,  val speech: Speech, private val display: Display, private val movement: Boolean, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean, private val documentation: Documentation) : Runnable {
 
     private var interrupted = false
 
@@ -21,7 +21,7 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
         experimentHandler.updateExperimentState(ExperimentState(currentStep, stopping, requiresUserInteraction))
 
         if (executeAgain) {
-            doStep(currentCommand, value!!, stopping)
+            doStep(currentCommand, value!!, stopping, movement)
         }
 
         if (requiresUserInteraction) {
@@ -45,7 +45,7 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
 
                     experimentHandler.updateExperimentState(ExperimentState(decision, stopping, false))
 
-                    doStep(currentCommand, value!!, stopping)
+                    doStep(currentCommand, value!!, stopping, movement)
                 }
             } else {
                 println("Interrupted")
@@ -54,13 +54,13 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
         }
     }
 
-    private fun doStep(currentCommand: String, value: String, stopping: Boolean) {
+    private fun doStep(currentCommand: String, value: String, stopping: Boolean, movement: Boolean) {
         documentation.addEvent("Executing $currentCommand with value \"$value\"")
         when (currentCommand) {
             "look_at" -> {
                 experimentHandler.cancelMovements()
                 val coordinates = value.replace(Regex("\\{|\\}|x|y|z|:"), "").split(",")
-                experimentHandler.setLookAtFuture(lookAt.startLookAt(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())!!)
+                experimentHandler.setLookAtFuture(lookAt.startLookAt(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble(),movement)!!)
                 /*if (stopping) {
                     lookAtFuture?.sync()
                 }*/
@@ -68,7 +68,11 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             "move_to" -> {
                 experimentHandler.cancelMovements()
                 val coordinates = value.replace(Regex("\\{|\\}|x|y|z|:"), "").split(",")
-                val moveToFuture = moveTo.startMoveTo(coordinates[0].toDouble(), coordinates[1].toDouble(), coordinates[2].toDouble())
+                val coordinateX = coordinates[0].takeIf { it.isNotBlank() && it != "null" }?.toDoubleOrNull() ?: 0.0
+                val coordinateY = coordinates[1].takeIf { it.isNotBlank() && it != "null" }?.toDoubleOrNull() ?: 0.0
+                val coordinateZ = coordinates[2].takeIf { it.isNotBlank() && it != "null" }?.toDoubleOrNull() ?: 0.0
+
+                val moveToFuture = moveTo.startMoveTo(coordinateX, coordinateY, coordinateZ)
                 experimentHandler.setMoveToFuture(moveToFuture!!)
                 if (stopping) {
                     while (!moveToFuture.isDone) {
@@ -94,7 +98,7 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
             }
             "say" -> {
                 experimentHandler.cancelSounds()
-                val sayFuture = speech.say(value)
+                val sayFuture = speech.say(value, movement)
                 experimentHandler.setSayFuture(sayFuture!!)
                 if (stopping) {
                     sayFuture.sync()
