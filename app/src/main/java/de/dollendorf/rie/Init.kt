@@ -7,10 +7,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.`object`.geometry.Vector3
+import com.aldebaran.qi.sdk.`object`.holder.AutonomousAbilitiesType
 import com.aldebaran.qi.sdk.`object`.holder.Holder
 import com.aldebaran.qi.sdk.`object`.locale.Language
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
+import com.aldebaran.qi.sdk.builder.HolderBuilder
 import com.aldebaran.qi.sdk.builder.TransformBuilder
 import java.io.File
 
@@ -60,6 +62,10 @@ class Init(private val qiContext: QiContext) {
         }
 
         val autonomousAbilitiesBoolean = config.getElement("autonomous_activity").toBoolean()
+        // gefährlich! es geht auch Berührungssensor aus anscheinend
+        // TODO: Besser implementieren, dass am anfang je nach situation alles auscgescaltet wird
+        // TODO: select klasse in Experiments zu sehen bekommmen
+        val holder = HolderBuilder.with(qiContext).withAutonomousAbilities(AutonomousAbilitiesType.UNSUPPORTED_ABILITIES).build() //just any holder
         AutonomousAbilitiesToggle().toggleAutonomousAbilities(autonomousAbilitiesBoolean, qiContext, holder)
 
         mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt(),autonomousAbilitiesBoolean))
