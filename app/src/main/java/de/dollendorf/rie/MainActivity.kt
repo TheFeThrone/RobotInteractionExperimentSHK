@@ -1,5 +1,6 @@
 package de.dollendorf.rie
 
+import android.content.res.AssetManager
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.widget.ImageView
@@ -47,7 +48,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             }
 
             initClass = Init(qiContext)
-            initClass.fullInit(this)
+            initClass.fullInit(this, assets)
             init = true
 
             val webInterface = Webinterface(config)
@@ -118,4 +119,5 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     fun setDocumentation(documentation: Documentation) {
         this.documentation = documentation
     }
+
 }

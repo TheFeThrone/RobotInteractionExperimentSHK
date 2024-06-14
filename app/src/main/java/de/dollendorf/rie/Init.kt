@@ -1,6 +1,7 @@
 package de.dollendorf.rie
 
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.os.Environment
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
@@ -18,7 +19,7 @@ class Init(private val qiContext: QiContext) {
 
     // private lateinit var holder: Holder
 
-    fun fullInit(mainActivity: MainActivity) {
+    fun fullInit(mainActivity: MainActivity, assets: AssetManager) {
         if (!File("${Environment.getExternalStorageDirectory()}/RIE/Logs").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Pictures").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Animations").isDirectory) {
             try {
                 File("${Environment.getExternalStorageDirectory()}/RIE/Animations").mkdirs()
@@ -72,7 +73,7 @@ class Init(private val qiContext: QiContext) {
         mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt(),autonomousAbilitiesBoolean))
         mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame, autonomousAbilitiesBoolean))
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
-        mainActivity.setAnimation(Animation(qiContext))
+        mainActivity.setAnimation(Animation(qiContext, assets))
         mainActivity.setDisplay(display)
         mainActivity.setDocumentation(Documentation(experimentFile!!))
     }
