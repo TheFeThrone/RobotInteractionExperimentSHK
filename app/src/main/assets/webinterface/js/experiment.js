@@ -73,7 +73,7 @@ var selectInput = {
             pointAtTypes: ['CLOSE_FRONT_LEFT', 'CLOSE_FRONT_RIGHT', 'CLOSE_MEDIUM_LEFT', 'CLOSE_MEDIUM_RIGHT', 'CLOSE_HALF_LEFT', 'CLOSE_HALF_RIGHT', 'FRONT_LEFT', 'FRONT_RIGHT', 'MEDIUM_LEFT', 'MEDIUM_RIGHT', 'HALF_LEFT', 'HALF_RIGHT']
         };
     },
-    template: '<div><select class="select" id="block-type-select" v-model="currentBlock.value"><option v-for="anim in pointAtTypes" :value="anim">{{anim}}</option></select></div>'
+    template: '<div><select class="select" id="block-type-select" v-model="currentBlock.value"><option disabled value="null">Select a Pointing-Animation</option><option v-for="anim in pointAtTypes" :value="anim">{{anim}}</option></select></div>'
 }
 
 var newExperiment = {
