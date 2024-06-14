@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot.activities
 
 import com.aldebaran.qi.Future
 import com.aldebaran.qi.QiException

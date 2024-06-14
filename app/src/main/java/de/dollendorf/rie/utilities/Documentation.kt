@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.utilities
 
 import android.os.Environment
 import java.io.File

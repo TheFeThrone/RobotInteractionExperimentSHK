@@ -1,9 +1,8 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot.activities
 
 import com.aldebaran.qi.Future
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.`object`.actuation.*
-import com.aldebaran.qi.sdk.`object`.geometry.Quaternion
 import com.aldebaran.qi.sdk.`object`.geometry.Vector3
 import com.aldebaran.qi.sdk.builder.LookAtBuilder
 import com.aldebaran.qi.sdk.builder.TransformBuilder

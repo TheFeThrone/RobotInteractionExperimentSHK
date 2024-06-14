@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot.activities
 
 import android.media.MediaPlayer
 import android.os.Environment
@@ -9,7 +9,7 @@ import com.aldebaran.qi.sdk.`object`.conversation.Say
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.builder.SayBuilder
 import com.aldebaran.qi.sdk.`object`.conversation.BodyLanguageOption
-import java.io.FileDescriptor
+import de.dollendorf.rie.MainActivity
 
 class Speech(private val qiContext: QiContext, private val locale: Locale, private val mainActivity: MainActivity, private val speed: Int, private val pitch: Int, private val movement: Boolean) {
 

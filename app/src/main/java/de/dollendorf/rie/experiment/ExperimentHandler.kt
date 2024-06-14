@@ -1,10 +1,14 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.experiment
 
 import com.aldebaran.qi.Future
+import de.dollendorf.rie.utilities.Documentation
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.robot.activities.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.jsonObject
 
-class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation, private val speech: Speech, private val display: Display, private val movement: Boolean, private val documentation: Documentation) : ExperimentObserver(), ExperimentControllerInterface, Runnable {
+class ExperimentHandler(private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation, private val speech: Speech, private val display: Display, private val movement: Boolean, private val documentation: Documentation) : ExperimentObserver(),
+    ExperimentControllerInterface, Runnable {
 
     private var steps: List<String>? = null
     private var lookAtFuture: Future<Void>? = null

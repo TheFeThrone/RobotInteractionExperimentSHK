@@ -1,5 +1,6 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.experiment.utilities
 
+import de.dollendorf.rie.utilities.JsonLoader
 import java.io.FileNotFoundException
 
 class ExperimentLoader(path: String) : JsonLoader(path) {

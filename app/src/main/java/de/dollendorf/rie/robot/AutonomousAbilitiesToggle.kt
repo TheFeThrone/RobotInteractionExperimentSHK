@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot
 
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.`object`.holder.AutonomousAbilitiesType

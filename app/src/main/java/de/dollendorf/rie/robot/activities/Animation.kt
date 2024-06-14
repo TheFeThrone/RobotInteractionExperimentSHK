@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot.activities
 
 import android.content.res.AssetManager
 import android.os.Environment
@@ -6,7 +6,6 @@ import android.os.Environment
 import android.util.Log
 import com.aldebaran.qi.Future
 import com.aldebaran.qi.sdk.QiContext
-import com.aldebaran.qi.sdk.`object`.actuation.*
 import com.aldebaran.qi.sdk.builder.AnimateBuilder
 import com.aldebaran.qi.sdk.builder.AnimationBuilder
 import java.io.File

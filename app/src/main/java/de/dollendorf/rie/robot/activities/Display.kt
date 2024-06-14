@@ -1,9 +1,10 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot.activities
 
 import android.graphics.BitmapFactory
 import android.os.Environment
 import android.widget.ImageView
 import androidx.core.view.isVisible
+import de.dollendorf.rie.MainActivity
 import kotlinx.coroutines.Runnable
 import java.io.File
 

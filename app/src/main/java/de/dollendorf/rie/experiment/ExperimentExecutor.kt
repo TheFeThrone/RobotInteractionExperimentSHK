@@ -1,8 +1,11 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.experiment
 
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.utilities.Documentation
+import de.dollendorf.rie.robot.activities.*
 import java.lang.Thread.currentThread
 
-class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation,  val speech: Speech, private val display: Display, private val movement: Boolean, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean, private val documentation: Documentation) : Runnable {
+class ExperimentExecutor(private val currentStep: Int, private val steps: List<String>, private val experiment: ExperimentLoader, private val lookAt: LookAtTarget, private val moveTo: MoveToTarget, private val animation: Animation, val speech: Speech, private val display: Display, private val movement: Boolean, private val experimentHandler: ExperimentHandler, private val executeAgain: Boolean, private val documentation: Documentation) : Runnable {
 
     private var interrupted = false
 

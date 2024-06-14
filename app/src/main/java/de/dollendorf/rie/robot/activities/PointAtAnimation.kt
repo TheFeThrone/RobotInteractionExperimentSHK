@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.robot.activities
 
 enum class PointAtAnimation {
     CLOSE_FRONT_LEFT,
