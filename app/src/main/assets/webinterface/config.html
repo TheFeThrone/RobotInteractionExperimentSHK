@@ -21,7 +21,11 @@
                     <option v-for="experiment in experiments" :value="experiment">{{experiment}}</option>
                 </select>
             </div>
-            <div></div>
+            <div>
+                <label for="autonomous">Autonomous Activity</label>
+                <input type="checkbox" id="autonomous" class="checkbox" value="Autonomous" v-model="config.autonomous_activity"/>
+                <label for="autonomous"></label>
+            </div>
             <div>
                 <label for="language">Language</label><br>
                 <select id="language" class="select" v-model="config.language">

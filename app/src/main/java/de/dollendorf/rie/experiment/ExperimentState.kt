@@ -1,4 +1,4 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.experiment
 
 import kotlinx.serialization.Serializable
 

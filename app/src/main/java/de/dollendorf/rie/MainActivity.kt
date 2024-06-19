@@ -1,14 +1,18 @@
 package de.dollendorf.rie
 
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.widget.ImageView
-import androidx.core.view.isVisible
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.aldebaran.qi.sdk.`object`.actuation.FreeFrame
 import com.aldebaran.qi.sdk.design.activity.RobotActivity
+import de.dollendorf.rie.experiment.ExperimentHandler
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.robot.activities.*
+import de.dollendorf.rie.experiment.utilities.Config
+import de.dollendorf.rie.utilities.Documentation
+import de.dollendorf.rie.web.Webinterface
+import kotlin.properties.Delegates
 
 
 class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
@@ -23,6 +27,7 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     private lateinit var experiment: ExperimentLoader
     private lateinit var experimentHandler: ExperimentHandler
     private lateinit var documentation: Documentation
+    private var movement by Delegates.notNull<Boolean>()
     private var init = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,12 +50,14 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
             }
 
             initClass = Init(qiContext)
-            initClass.fullInit(this)
+            initClass.fullInit(this, assets)
             init = true
 
             val webInterface = Webinterface(config)
 
-            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, animation, speech, display, documentation)
+            movement = config.getElement("autonomous_activity").toBoolean()
+
+            experimentHandler = ExperimentHandler(experiment, lookAt, moveTo, animation, speech, display, movement, documentation)
 
             webInterface.setExperimentHandler(experimentHandler)
 
@@ -114,4 +121,5 @@ class MainActivity : RobotActivity(), RobotLifecycleCallbacks {
     fun setDocumentation(documentation: Documentation) {
         this.documentation = documentation
     }
+
 }

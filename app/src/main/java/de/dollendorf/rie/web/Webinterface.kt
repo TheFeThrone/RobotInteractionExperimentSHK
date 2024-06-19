@@ -1,8 +1,11 @@
-package de.dollendorf.rie
+package de.dollendorf.rie.web
 
 import android.content.res.AssetManager
 import android.os.Environment
-import android.provider.ContactsContract.Directory
+import de.dollendorf.rie.experiment.utilities.Config
+import de.dollendorf.rie.experiment.*
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.utilities.Documentation
 import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
@@ -23,7 +26,8 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.nio.charset.Charset
 
-class Webinterface(private val config: Config) : ExperimentController(), ExperimentObserverInterface {
+class Webinterface(private val config: Config) : ExperimentController(),
+    ExperimentObserverInterface {
 
     private val sessions = ArrayList<WebSocketServerSession>()
     private lateinit var experimentHandler: ExperimentHandler

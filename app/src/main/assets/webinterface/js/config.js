@@ -5,7 +5,8 @@ var vm = new Vue({
         experiment: "experiment.json",
         language: "de_DE",
         speech_speed: 75,
-        speech_pitch: 80
+        speech_pitch: 80,
+        autonomous_activity: true
     },
     experiments: null
   },

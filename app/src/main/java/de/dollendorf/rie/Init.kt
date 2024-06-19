@@ -1,6 +1,7 @@
 package de.dollendorf.rie
 
 import android.content.pm.PackageManager
+import android.content.res.AssetManager
 import android.os.Environment
 import android.widget.ImageView
 import androidx.core.app.ActivityCompat
@@ -11,10 +12,19 @@ import com.aldebaran.qi.sdk.`object`.locale.Language
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
 import com.aldebaran.qi.sdk.builder.TransformBuilder
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.robot.activities.*
+import de.dollendorf.rie.robot.AutonomousAbilitiesToggle
+import de.dollendorf.rie.experiment.utilities.Config
+import de.dollendorf.rie.utilities.Documentation
 import java.io.File
 
+
 class Init(private val qiContext: QiContext) {
-    fun fullInit(mainActivity: MainActivity) {
+
+    // private lateinit var holder: Holder
+
+    fun fullInit(mainActivity: MainActivity, assets: AssetManager) {
         if (!File("${Environment.getExternalStorageDirectory()}/RIE/Logs").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/AudioFiles").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Pictures").isDirectory || !File("${Environment.getExternalStorageDirectory()}/RIE/Animations").isDirectory) {
             try {
                 File("${Environment.getExternalStorageDirectory()}/RIE/Animations").mkdirs()
@@ -27,6 +37,7 @@ class Init(private val qiContext: QiContext) {
         }
         val baseFrame = qiContext.mapping.makeFreeFrame()
         val robotFrame = qiContext.actuation.robotFrame()
+
         val transform = TransformBuilder.create().fromTranslation(Vector3(0.0,0.0,0.0))
         while (mainActivity.findViewById<ImageView>(R.id.experimentPicture) == null) {
             Thread.sleep(10)
@@ -52,10 +63,22 @@ class Init(private val qiContext: QiContext) {
         } else {
             Locale(Language.ENGLISH, Region.UNITED_STATES)
         }
-        mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt()))
-        mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame))
+
+        // Check for autonomous
+        val autonomousAbilitiesBoolean = config.getElement("autonomous_activity").toBoolean()
+        if (!autonomousAbilitiesBoolean){ AutonomousAbilitiesToggle().toggleAutonomousAbilities(qiContext) }
+
+        // TODO: Besser implementieren, dass am anfang je nach situation alles auscgescaltet wird
+        // TODO: DONE select klasse in Experiments zu sehen bekommmen
+        /*
+        val holder = HolderBuilder.with(qiContext).withAutonomousAbilities(AutonomousAbilitiesType.UNSUPPORTED_ABILITIES).build() //just any holder
+        AutonomousAbilitiesToggle().toggleAutonomousAbilities(autonomousAbilitiesBoolean, qiContext, holder)
+         */
+
+        mainActivity.setSpeech(Speech(qiContext, locale, mainActivity, config.getElement("speech_speed")!!.toInt(), config.getElement("speech_pitch")!!.toInt(),autonomousAbilitiesBoolean))
+        mainActivity.setLookAt(LookAtTarget(qiContext, baseFrame, autonomousAbilitiesBoolean))
         mainActivity.setMoveTo(MoveToTarget(qiContext, baseFrame))
-        mainActivity.setAnimation(Animation(qiContext))
+        mainActivity.setAnimation(Animation(qiContext, assets))
         mainActivity.setDisplay(display)
         mainActivity.setDocumentation(Documentation(experimentFile!!))
     }
