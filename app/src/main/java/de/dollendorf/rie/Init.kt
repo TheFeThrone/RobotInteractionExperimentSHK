@@ -12,6 +12,11 @@ import com.aldebaran.qi.sdk.`object`.locale.Language
 import com.aldebaran.qi.sdk.`object`.locale.Locale
 import com.aldebaran.qi.sdk.`object`.locale.Region
 import com.aldebaran.qi.sdk.builder.TransformBuilder
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.robot.activities.*
+import de.dollendorf.rie.robot.AutonomousAbilitiesToggle
+import de.dollendorf.rie.experiment.utilities.Config
+import de.dollendorf.rie.utilities.Documentation
 import java.io.File
 
 

@@ -1,15 +1,17 @@
 package de.dollendorf.rie
 
-import android.content.res.AssetManager
-import android.graphics.Bitmap
 import android.os.Bundle
-import android.widget.ImageView
-import androidx.core.view.isVisible
 import com.aldebaran.qi.sdk.QiContext
 import com.aldebaran.qi.sdk.QiSDK
 import com.aldebaran.qi.sdk.RobotLifecycleCallbacks
 import com.aldebaran.qi.sdk.`object`.actuation.FreeFrame
 import com.aldebaran.qi.sdk.design.activity.RobotActivity
+import de.dollendorf.rie.experiment.ExperimentHandler
+import de.dollendorf.rie.experiment.utilities.ExperimentLoader
+import de.dollendorf.rie.robot.activities.*
+import de.dollendorf.rie.experiment.utilities.Config
+import de.dollendorf.rie.utilities.Documentation
+import de.dollendorf.rie.web.Webinterface
 import kotlin.properties.Delegates
 
 
