@@ -1,6 +1,6 @@
 var experiments = {
     props: ['experiment'],
-    template: '<button class="grid-item" @click="buttonClick(experiment)" @contextmenu.prevent="handler(experiment)">{{experiment}}</button>',
+    template: experimentTemplates.experiments,
     methods: {
         buttonClick: (experiment) => {
             vm.experimentButtonClick(experiment);
@@ -16,7 +16,7 @@ var experiments = {
 
 var experimentEditor = {
     props: ['block', 'currentExperiment'],
-    template: `<button v-if="block !== '+' && block !== 'Save & Exit'" class="grid-item" @click="buttonClick(block)" :title="currentExperiment.experiment.sequence[block].value">{{currentExperiment.experiment.sequence[block].friendly_name}}</button><br><button v-else class="grid-item" @click="buttonClick(block)">{{block}}</button>`,
+    template: experimentTemplates.editor.experiment,
     methods: {
         buttonClick: (block) => {
             vm.editButtonClick(block);
@@ -28,27 +28,27 @@ var experimentEditor = {
 }
 
 var noInput = {
-    template: '<div></div>'
+    template: experimentTemplates.input.none,
 }
 
 var textInput = {
     props: ['currentBlock'],
-    template: '<input type="text" class="text" v-model="currentBlock.value">'
+    template: experimentTemplates.input.text,
 }
 
 var numberInput = {
     props: ['currentBlock'],
-    template: '<input type="number" class="number" v-model="currentBlock.value">'
+    template: experimentTemplates.input.number,
 }
 
 var coordinateInput = {
     props: ['currentBlock'],
-    template: '<div><input type="number" class="number" v-model="currentBlock.value.x"><input type="number" class="number" v-model="currentBlock.value.y"><input type="number" class="number" v-model="currentBlock.value.z"></div>'
+    template: experimentTemplates.input.coordinate
 }
 
 var fileInput = {
     props: ['currentBlock'],
-    template: '<input type="file" class="file" @change="uploadFile($event)">',
+    template: experimentTemplates.input.file,
     methods: {
         uploadFile: (event) => {
             vm.file.data = event.target.files[0];
@@ -73,7 +73,7 @@ var selectInput = {
             pointAtTypes: ['CLOSE_FRONT_LEFT', 'CLOSE_FRONT_RIGHT', 'CLOSE_MEDIUM_LEFT', 'CLOSE_MEDIUM_RIGHT', 'CLOSE_HALF_LEFT', 'CLOSE_HALF_RIGHT', 'FRONT_LEFT', 'FRONT_RIGHT', 'MEDIUM_LEFT', 'MEDIUM_RIGHT', 'HALF_LEFT', 'HALF_RIGHT']
         };
     },
-    template: '<select class="select" id="block-type-select" v-model="currentBlock.value"><option disabled value="null">Select a Pointing-Animation</option><option v-for="anim in pointAtTypes" :value="anim">{{anim}}</option></select>'
+    template: experimentTemplates.input.select
 }
 
 var newExperiment = {
@@ -82,7 +82,7 @@ var newExperiment = {
             newName: ""
         }
     },
-    template: '<div class="two-element-container"><div><label for="new-experiment-name">Experiment name</label><br><input type="text" id="new-experiment-name" v-model="newName"></div><div></div><button class="grid-item" @click="createButtonClick(newName)">Create Experiment</button><button class="grid-item" @click="exitButtonClick">Cancel</button></div>',
+    template: experimentTemplates.newExperiment,
     methods: {
         createButtonClick: (name) => {
             vm.createExperiment(name);
@@ -98,7 +98,7 @@ var newExperiment = {
 
 var blockEditor = {
     props: ['currentBlock'],
-    template: `<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Point At">Point At</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentBlock.friendly_name == 'Reset Display' || currentBlock.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentBlock.friendly_name == 'Say' || currentBlock.friendly_name == 'Empty'" id="input" v-bind:current-block="currentBlock"></text-input><number-input v-else-if="currentBlock.friendly_name == 'Time'" id="input" v-bind:current-block="currentBlock"></number-input><coordinate-input v-else-if="currentBlock.friendly_name == 'Look At Target' || currentBlock.friendly_name == 'Move To'" id="input" v-bind:current-block="currentBlock"></coordinate-input><file-input v-else-if="currentBlock.friendly_name == 'Animation' || currentBlock.friendly_name == 'Display' || currentBlock.friendly_name == 'Sound'" id="input" v-bind:current-block="currentBlock"></file-input><select-input v-else-if="currentBlock.friendly_name == 'Point At'" id="input" v-bind:current-block="currentBlock"></select-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"><label for="stopping-checkbox"></label></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" id="interaction-checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"><label for="interaction-checkbox"></label></div><button v-if="currentBlock.requires_user_interaction && !(typeof possibility === 'string')" v-for="possibility in currentBlock.possibilities" class="grid-item" @click="editPossibility(possibility)">{{possibility.friendly_name}}</button><button v-if="currentBlock.requires_user_interaction" class="grid-item" @click="addPossibility">+</button><button class="grid-item" @click="exitButtonClick">Save & Exit</button></div>`,
+    template: experimentTemplates.editor.block,
     methods: {
         exitButtonClick: () => {
             if (vm.currentBlock.friendly_name == null) {
@@ -173,7 +173,7 @@ var blockEditor = {
 
 var possibilityEditor = {
     props: ['currentPossibility', 'currentExperiment'],
-    template: `<div class="two-element-container"><div><label for="block-type-select">Possibility type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentPossibility.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Point At">Point At</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentPossibility.friendly_name == 'Reset Display' || currentPossibility.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentPossibility.friendly_name == 'Say' || currentPossibility.friendly_name == 'Empty'" id="input" v-bind:current-block="currentPossibility"></text-input><number-input v-else-if="currentPossibility.friendly_name == 'Time'" id="input" v-bind:current-block="currentPossibility"></number-input><coordinate-input v-else-if="currentPossibility.friendly_name == 'Look At Target' || currentPossibility.friendly_name == 'Move To'" id="input" v-bind:current-block="currentPossibility"></coordinate-input><file-input v-else-if="currentPossibility.friendly_name == 'Animation' || currentPossibility.friendly_name == 'Display' || currentPossibility.friendly_name == 'Sound'" id="input" v-bind:current-block="currentPossibility"></file-input><select-input v-else-if="currentPossibility.friendly_name == 'Point At'" id="input" v-bind:current-block="currentPossibility"></select-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentPossibility.stopping"><label for="stopping-checkbox"></label></div><div><label for="jump-checkbox">Jump after decision</label><br><input type="checkbox" class="checkbox" id="jump-checkbox" v-model="currentPossibility.jump.enabled"><label for="jump-checkbox"></label></div><div v-if="currentPossibility.jump.enabled"><label for="target-block">Target block</label><select id="target-block" class="select" v-model="currentPossibility.jump.target"><option v-for="block in currentExperiment.order" v-if="block !== '+' && block !== 'Save & Exit'" :value="block">{{currentExperiment.experiment.sequence[block].friendly_name}}: {{currentExperiment.experiment.sequence[block].value}}</option></select></div><div v-if="currentPossibility.jump.enabled"><label for="again-checkbox">Execute block again</label><br><input id="again-checkbox" type="checkbox" class="checkbox" v-model="currentPossibility.jump.again"><label for="again-checkbox"></label></div><button class="grid-item" @click="exitButtonClick">Save & Exit</button></div>`,
+    template: experimentTemplates.editor.possibility,
     methods: {
         exitButtonClick: () => {
             if (!vm.currentPossibility.jump.enabled || vm.currentPossibility.jump.target == "") {
@@ -218,7 +218,7 @@ var possibilityEditor = {
 
 var state = {
     props: ['state', 'experiments', 'currentExperiment', 'currentBlock', 'currentPossibility'],
-    template: '<div v-if="state == 0" class="grid-container"><experiments v-for="experiment in experiments" v-bind:experiment="experiment"></experiments></div><div v-else-if="state == 1" class="grid-container"><experiment-editor v-for="block in currentExperiment.order" v-bind:current-experiment="currentExperiment" v-bind:block="block"></experiment-editor></div><new-experiment v-else-if="state == 2"></new-experiment><block-editor v-else-if="state == 3" v-bind:current-block="currentBlock"></block-editor><possibility-editor v-else-if="state == 4" v-bind:current-possibility="currentPossibility" v-bind:current-experiment="currentExperiment"></possibility-editor>',
+    template: experimentTemplates.state,
     components: {
         "experiments": experiments,             //0
         "new-experiment": newExperiment,        //2

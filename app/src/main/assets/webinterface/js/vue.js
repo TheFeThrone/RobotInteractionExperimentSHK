@@ -1,6 +1,6 @@
 var experimentElement = {
     props: ['step', 'experimentState'],
-    template: `<button v-if="step.index == experimentState.index && !experimentState.requiresUserInteraction" class="grid-item active" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}<br>{{step.shortValue}}</button><button v-else-if="step.index == experimentState.index" class="grid-item stopped" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}<br>{{step.shortValue}}</button><button v-else class="grid-item" :title="step.value" @click="buttonClick(step.index)">{{step.friendlyName}}<br>{{step.shortValue}}</button>`,
+    template: vueTemplates.experimentElement,
     methods: {
         buttonClick: (index) => {
             vm.jumpButtonClick(index);
@@ -13,7 +13,7 @@ var experimentElement = {
 
 var decisionElement = {
     props: ['element', 'decisionState'],
-    template: `<button v-if="decisionState.index == element.index" class="grid-item active" :title="element.value" @click="buttonClick(element.index)">{{element.friendlyName}}<br>{{element.shortValue}}</button><button v-else class="grid-item" :title="element.value" @click="buttonClick(element.index)">{{element.friendlyName}}<br>{{element.shortValue}}</button>`,
+    template: vueTemplates.decisionElement,
     methods: {
         buttonClick: (index) => {
             vm.decisionButtonClick(index);
@@ -25,7 +25,7 @@ var decisionElement = {
 }
 
 var noConnection = {
-    template: '<button class="noconnection" @click="reconnect">Unable to establish connection. Click to reconnect.</button>',
+    template: vueTemplates.noConnection,
     methods: {
         reconnect: () => {
             vm.reconnect();
@@ -38,7 +38,7 @@ var noConnection = {
 
 var state = {
     props: ['steps', 'experimentState', 'decisionState', 'currentState'],
-    template: '<div v-if="currentState == 0" class="one-element-container"><button class="start-experiment" @click="startExperiment">Experiment has not started yet. Click to start.</button></div><div v-else-if="currentState == 1" class="grid-container"><experiment-element v-for="step in steps" :key="step.index" v-bind:step="step" v-bind:experiment-state="experimentState"></experiment-element></div><div v-else-if="currentState == 2" class="grid-container"><decision-element v-for="element in steps[experimentState.index].possibilities" :key="element.index" v-bind:element="element" v-bind:decision-state="decisionState"></decision-element></div>',
+    template: vueTemplates.state,
     methods: {
         startExperiment: () => {
             vm.startExperiment();
@@ -53,7 +53,7 @@ var state = {
 
 var parent = {
     props: ['connection', 'steps', 'experimentState', 'decisionState', 'currentState'],
-    template: '<div v-if="connection"><state v-bind:steps="steps" v-bind:experiment-state="experimentState" v-bind:current-state="currentState" v-bind:decision-state="decisionState"></state></div><div v-else class="one-element-container"><no-connection></no-connection></div>',
+    template: vueTemplates.parent,
     components: {
         "state": state,
         "no-connection": noConnection
