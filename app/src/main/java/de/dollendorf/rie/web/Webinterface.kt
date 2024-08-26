@@ -2,6 +2,8 @@ package de.dollendorf.rie.web
 
 import android.content.res.AssetManager
 import android.os.Environment
+import android.util.Log
+import android.webkit.ConsoleMessage
 import de.dollendorf.rie.experiment.utilities.Config
 import de.dollendorf.rie.experiment.*
 import de.dollendorf.rie.experiment.utilities.ExperimentLoader
@@ -10,6 +12,7 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
+import io.ktor.server.http.content.*
 import io.ktor.server.netty.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -22,9 +25,12 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ClosedReceiveChannelException
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.io.Console
 import java.io.File
 import java.io.FileNotFoundException
 import java.nio.charset.Charset
+import java.util.logging.ConsoleHandler
+import java.util.regex.Pattern
 
 class Webinterface(private val config: Config) : ExperimentController(),
     ExperimentObserverInterface {
@@ -51,6 +57,24 @@ class Webinterface(private val config: Config) : ExperimentController(),
                 }
                 get("/js/vue.js") {
                     call.respondText(assets.open("webinterface/js/vue.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/classes/block.js") {
+                    call.respondText(assets.open("webinterface/js/classes/block.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/classes/experiment.js") {
+                    call.respondText(assets.open("webinterface/js/classes/experiment.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/classes/possibility.js") {
+                    call.respondText(assets.open("webinterface/js/classes/possibility.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/handlers/linkedList.js") {
+                    call.respondText(assets.open("webinterface/js/handlers/linkedList.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/handlers/parseExperiment.js") {
+                    call.respondText(assets.open("webinterface/js/handlers/parseExperiment.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
+                }
+                get("/js/handlers/templates.js") {
+                    call.respondText(assets.open("webinterface/js/handlers/templates.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
                 }
                 get("/css/style.css") {
                     call.respondText(assets.open("webinterface/css/style.css").bufferedReader().use { it.readText() }, ContentType.Text.CSS)
@@ -146,12 +170,6 @@ class Webinterface(private val config: Config) : ExperimentController(),
                         config.writeData(newValue)
                     }
                     call.respondText(config.getFullData())
-                }
-                get("/js/config.js") {
-                    call.respondText(assets.open("webinterface/js/config.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
-                }
-                get("/js/experiment.js") {
-                    call.respondText(assets.open("webinterface/js/experiment.js").bufferedReader().use { it.readText() }, ContentType.Text.JavaScript)
                 }
                 webSocket("/websocket") {
                     try {
