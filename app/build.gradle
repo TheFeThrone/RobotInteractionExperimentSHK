@@ -53,9 +53,9 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
     implementation 'com.aldebaran:qisdk:1.7.5'
 	implementation 'com.aldebaran:qisdk-design:1.7.5'
-    implementation "io.ktor:ktor-server-core:2.2.1"
-    implementation "io.ktor:ktor-server-netty:2.2.1"
-    implementation "io.ktor:ktor-server-status-pages:2.2.1"
-    implementation "io.ktor:ktor-server-default-headers:2.2.1"
-    implementation "io.ktor:ktor-server-websockets:2.2.1"
+    implementation "io.ktor:ktor-server-core:2.3.12"
+    implementation "io.ktor:ktor-server-netty:2.3.12"
+    implementation "io.ktor:ktor-server-status-pages:2.3.12"
+    implementation "io.ktor:ktor-server-default-headers:2.3.12"
+    implementation "io.ktor:ktor-server-websockets:2.3.12"
 }
