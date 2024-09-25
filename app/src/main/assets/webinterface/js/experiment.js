@@ -43,7 +43,7 @@ var numberInput = {
 
 var coordinateInput = {
     props: ['currentBlock'],
-    template: '<div><input type="number" class="number" v-model="currentBlock.value.x"><input type="number" class="number" v-model="currentBlock.value.y"><input type="number" class="number" v-model="currentBlock.value.z"></div>'
+    template: '<div>X:<input type="number" class="number" v-model="currentBlock.value.x">Y:<input type="number" class="number" v-model="currentBlock.value.y">Z:<input type="number" class="number" v-model="currentBlock.value.z"></div>'
 }
 
 var fileInput = {
@@ -76,6 +76,38 @@ var selectInput = {
     template: '<select class="select" id="block-type-select" v-model="currentBlock.value"><option disabled value="null">Select a Pointing-Animation</option><option v-for="anim in pointAtTypes" :value="anim">{{anim}}</option></select>'
 }
 
+var dynamicMultiTextInput = {
+    props: ['currentBlock'],
+    template: `
+        <div>
+            <div v-for="(input, index) in inputs" :key="index">
+                <input type="text" class="text" v-model="inputs[index]">
+                <button v-if="index === inputs.length - 1" @click="addInput">+</button>
+            </div>
+        </div>
+    `,
+    data() {
+        return {
+            inputs: [""]
+        };
+    },
+    methods: {
+        addInput() {
+            this.inputs.push("");
+        }
+    },
+    computed: {
+        combinedString() {
+            return this.inputs.filter(input => input.trim() !== "").join("¶");
+        }
+    },
+    watch: {
+        combinedString(newValue) {
+            this.currentBlock.value = newValue;
+        }
+    }
+}
+
 var newExperiment = {
     data: function() {
         return {
@@ -98,7 +130,7 @@ var newExperiment = {
 
 var blockEditor = {
     props: ['currentBlock'],
-    template: `<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Point At">Point At</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentBlock.friendly_name == 'Reset Display' || currentBlock.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentBlock.friendly_name == 'Say' || currentBlock.friendly_name == 'Empty'" id="input" v-bind:current-block="currentBlock"></text-input><number-input v-else-if="currentBlock.friendly_name == 'Time'" id="input" v-bind:current-block="currentBlock"></number-input><coordinate-input v-else-if="currentBlock.friendly_name == 'Look At Target' || currentBlock.friendly_name == 'Move To'" id="input" v-bind:current-block="currentBlock"></coordinate-input><file-input v-else-if="currentBlock.friendly_name == 'Animation' || currentBlock.friendly_name == 'Display' || currentBlock.friendly_name == 'Sound'" id="input" v-bind:current-block="currentBlock"></file-input><select-input v-else-if="currentBlock.friendly_name == 'Point At'" id="input" v-bind:current-block="currentBlock"></select-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"><label for="stopping-checkbox"></label></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" id="interaction-checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"><label for="interaction-checkbox"></label></div><button v-if="currentBlock.requires_user_interaction && !(typeof possibility === 'string')" v-for="possibility in currentBlock.possibilities" class="grid-item" @click="editPossibility(possibility)">{{possibility.friendly_name}}</button><button v-if="currentBlock.requires_user_interaction" class="grid-item" @click="addPossibility">+</button><button class="grid-item" @click="exitButtonClick">Save & Exit</button></div>`,
+    template: `<div class="two-element-container"><div><label for="block-type-select">Block type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentBlock.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time in ms</option><option value="Point At">Point At</option><option value="Random Say">Say One Of Many</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentBlock.friendly_name == 'Reset Display' || currentBlock.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentBlock.friendly_name == 'Say' || currentBlock.friendly_name == 'Empty'" id="input" v-bind:current-block="currentBlock"></text-input><number-input v-else-if="currentBlock.friendly_name == 'Time'" id="input" v-bind:current-block="currentBlock"></number-input><coordinate-input v-else-if="currentBlock.friendly_name == 'Look At Target' || currentBlock.friendly_name == 'Move To'" id="input" v-bind:current-block="currentBlock"></coordinate-input><file-input v-else-if="currentBlock.friendly_name == 'Animation' || currentBlock.friendly_name == 'Display' || currentBlock.friendly_name == 'Sound'" id="input" v-bind:current-block="currentBlock"></file-input><select-input v-else-if="currentBlock.friendly_name == 'Point At'" id="input" v-bind:current-block="currentBlock"></select-input><dynamic-multi-text-input v-else-if="currentBlock.friendly_name == 'Random Say'" v-bind:current-block="currentBlock"></dynamic-multi-text-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentBlock.stopping"><label for="stopping-checkbox"></label></div><div><label for="interaction-checkbox">Requires user interaction</label><br><input type="checkbox" id="interaction-checkbox" class="checkbox" v-model="currentBlock.requires_user_interaction"><label for="interaction-checkbox"></label></div><button v-if="currentBlock.requires_user_interaction && !(typeof possibility === 'string')" v-for="possibility in currentBlock.possibilities" class="grid-item" @click="editPossibility(possibility)">{{possibility.friendly_name}}</button><button v-if="currentBlock.requires_user_interaction" class="grid-item" @click="addPossibility">+</button><button class="grid-item" @click="exitButtonClick">Save & Exit</button></div>`,
     methods: {
         exitButtonClick: () => {
             if (vm.currentBlock.friendly_name == null) {
@@ -165,13 +197,14 @@ var blockEditor = {
         "coordinate-input": coordinateInput,
         "file-input": fileInput,
         "select-input": selectInput,
+        "dynamic-multi-text-input": dynamicMultiTextInput,
         "vm": vm
     }
 }
 
 var possibilityEditor = {
     props: ['currentPossibility', 'currentExperiment'],
-    template: `<div class="two-element-container"><div><label for="block-type-select">Possibility type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentPossibility.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Point At">Point At</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentPossibility.friendly_name == 'Reset Display' || currentPossibility.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentPossibility.friendly_name == 'Say' || currentPossibility.friendly_name == 'Empty'" id="input" v-bind:current-block="currentPossibility"></text-input><number-input v-else-if="currentPossibility.friendly_name == 'Time'" id="input" v-bind:current-block="currentPossibility"></number-input><coordinate-input v-else-if="currentPossibility.friendly_name == 'Look At Target' || currentPossibility.friendly_name == 'Move To'" id="input" v-bind:current-block="currentPossibility"></coordinate-input><file-input v-else-if="currentPossibility.friendly_name == 'Animation' || currentPossibility.friendly_name == 'Display' || currentPossibility.friendly_name == 'Sound'" id="input" v-bind:current-block="currentPossibility"></file-input><select-input v-else-if="currentPossibility.friendly_name == 'Point At'" id="input" v-bind:current-block="currentPossibility"></select-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentPossibility.stopping"><label for="stopping-checkbox"></label></div><div><label for="jump-checkbox">Jump after decision</label><br><input type="checkbox" class="checkbox" id="jump-checkbox" v-model="currentPossibility.jump.enabled"><label for="jump-checkbox"></label></div><div v-if="currentPossibility.jump.enabled"><label for="target-block">Target block</label><select id="target-block" class="select" v-model="currentPossibility.jump.target"><option v-for="block in currentExperiment.order" v-if="block !== '+' && block !== 'Save & Exit'" :value="block">{{currentExperiment.experiment.sequence[block].friendly_name}}: {{currentExperiment.experiment.sequence[block].value}}</option></select></div><div v-if="currentPossibility.jump.enabled"><label for="again-checkbox">Execute block again</label><br><input id="again-checkbox" type="checkbox" class="checkbox" v-model="currentPossibility.jump.again"><label for="again-checkbox"></label></div><button class="grid-item" @click="exitButtonClick">Save & Exit</button></div>`,
+    template: `<div class="two-element-container"><div><label for="block-type-select">Possibility type</label><br><select class="select" id="block-type-select" @change="typeChanged" v-model="currentPossibility.friendly_name"><option value="Animation">Animation</option><option value="Display">Display</option><option value="Reset Display">Reset Display</option><option value="Look At Target">Look At Target</option><option value="Reset Look At">Reset Look At</option><option value="Move To">Move To</option><option value="Say">Say</option><option value="Sound">Sound</option><option value="Time">Time</option><option value="Point At">Point At</option><option value="Random Say">Say One Of Many</option><option value="Empty">Empty</option></select></div><div><label for="input">Value</label><br><no-input v-if="currentPossibility.friendly_name == 'Reset Display' || currentPossibility.friendly_name == 'Reset Look At'" id="input"></no-input><text-input v-else-if="currentPossibility.friendly_name == 'Say' || currentPossibility.friendly_name == 'Empty'" id="input" v-bind:current-block="currentPossibility"></text-input><number-input v-else-if="currentPossibility.friendly_name == 'Time'" id="input" v-bind:current-block="currentPossibility"></number-input><coordinate-input v-else-if="currentPossibility.friendly_name == 'Look At Target' || currentPossibility.friendly_name == 'Move To'" id="input" v-bind:current-block="currentPossibility"></coordinate-input><file-input v-else-if="currentPossibility.friendly_name == 'Animation' || currentPossibility.friendly_name == 'Display' || currentPossibility.friendly_name == 'Sound'" id="input" v-bind:current-block="currentPossibility"></file-input><select-input v-else-if="currentPossibility.friendly_name == 'Point At'" id="input" v-bind:current-block="currentPossibility"></select-input><dynamic-multi-text-input v-else-if="currentBlock.friendly_name == 'Random Say'" v-bind:current-block="currentBlock"></dynamic-multi-text-input></div><div><label for="stopping-checkbox">Stopping</label><br><input type="checkbox" id="stopping-checkbox" class="checkbox" v-model="currentPossibility.stopping"><label for="stopping-checkbox"></label></div><div><label for="jump-checkbox">Jump after decision</label><br><input type="checkbox" class="checkbox" id="jump-checkbox" v-model="currentPossibility.jump.enabled"><label for="jump-checkbox"></label></div><div v-if="currentPossibility.jump.enabled"><label for="target-block">Target block</label><select id="target-block" class="select" v-model="currentPossibility.jump.target"><option v-for="block in currentExperiment.order" v-if="block !== '+' && block !== 'Save & Exit'" :value="block">{{currentExperiment.experiment.sequence[block].friendly_name}}: {{currentExperiment.experiment.sequence[block].value}}</option></select></div><div v-if="currentPossibility.jump.enabled"><label for="again-checkbox">Execute block again</label><br><input id="again-checkbox" type="checkbox" class="checkbox" v-model="currentPossibility.jump.again"><label for="again-checkbox"></label></div><button class="grid-item" @click="exitButtonClick">Save & Exit</button></div>`,
     methods: {
         exitButtonClick: () => {
             if (!vm.currentPossibility.jump.enabled || vm.currentPossibility.jump.target == "") {
@@ -210,6 +243,7 @@ var possibilityEditor = {
         "coordinate-input": coordinateInput,
         "file-input": fileInput,
         "select-input": selectInput,
+        "dynamic-multi-text-input": dynamicMultiTextInput,
         "vm": vm
     }
 }
@@ -466,6 +500,7 @@ var vm = new Vue({
             "Sound": "sound_",
             "Time": "time_",
             "Point At": "point_at_",
+            "Random Say": "random_say_",
             "Empty": "empty_"
         };
 
