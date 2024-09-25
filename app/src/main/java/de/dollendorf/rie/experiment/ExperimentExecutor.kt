@@ -127,6 +127,18 @@ class ExperimentExecutor(private val currentStep: Int, private val steps: List<S
                     animationFuture.sync()
                 }
             }
+            "random_say" -> {
+                val saysArray = value.split("¶")
+                if (saysArray.isNotEmpty()){
+                    val selectedRandomSay = saysArray.random()
+                    experimentHandler.cancelSounds()
+                    val sayFuture = speech.say(selectedRandomSay, movement)
+                    experimentHandler.setSayFuture(sayFuture!!)
+                    if (stopping) {
+                        sayFuture.sync()
+                    }
+                }
+            }
             "empty" -> {
 
             }
