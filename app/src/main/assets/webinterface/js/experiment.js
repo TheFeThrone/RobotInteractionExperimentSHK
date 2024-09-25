@@ -110,8 +110,6 @@ var blockEditor = {
             vm.returnFromBlockEditor();
         },
         addPossibility: () => {
-            vm.setPossibilityName();
-
             // Create new possibilty object
             vm.currentPossibility = {
                 name: null,
@@ -244,7 +242,7 @@ var vm = new Vue({
         stopping: true,
         requires_user_interaction: false,
         possibilities: {
-            order: ""
+            order: "",
         }
     },
     currentPossibility: {
@@ -287,56 +285,95 @@ var vm = new Vue({
     },
     setBlockName: function() {
         var name = this.getBlockName(this.currentBlock.friendly_name, this.currentExperiment.order);
+       console.log("Test", "Generated block name: " + name);
+
+       // Check if the block name is null (hasn't been named yet)
         if (this.currentBlock.name == null) {
+            // Assign the generated name to the current block
             this.currentBlock.name = name;
+            // Add the block to the experiments sequence using the name as key
             this.currentExperiment.experiment.sequence[name] = this.currentBlock;
-            if (this.currentExperiment.experiment.sequence.order == "") {
+
+            // If the block order is empty, set the order to the new order name
+            if (this.currentExperiment.experiment.sequence.order === "") {
                 this.currentExperiment.experiment.sequence.order = name;
             } else {
+                // Otherwise, append the new possibility name to the possibilities order
                 this.currentExperiment.experiment.sequence.order = this.currentExperiment.experiment.sequence.order + "," + name;
             }
+            // ignore + and save in UI order
             this.currentExperiment.order.splice(this.currentExperiment.order.length - 2, 0, name);
         } else {
-            if (this.currentBlock.name.substring(0, this.currentBlock.name.lastIndexOf('_')) != name.substring(0, name.lastIndexOf('_'))) {
+            // If the block already has a name, check if the base name (before the underscore) has changed
+            var oldNameBase = this.currentBlock.name.substring(0, this.currentBlock.name.lastIndexOf('_'));
+            var newNameBase = name.substring(0, name.lastIndexOf('_'));
+
+            if (oldNameBase !== newNameBase) {
+                // Remove the old block name from the block object
                 delete this.currentExperiment.experiment.sequence[this.currentBlock.name];
+                console.log("Test", "Replacing block: " + this.currentBlock.name + " with: " + name);
+                // Replace the old block name with the new name in the block order for ui and normal
                 this.currentExperiment.experiment.sequence.order = this.currentExperiment.experiment.sequence.order.replace(this.currentBlock.name, name);
                 this.currentExperiment.order[this.currentExperiment.order.indexOf(this.currentBlock.name)] = name;
+                // Set the new block name
                 this.currentBlock.name = name;
+                // Add the block to the sequence object under the new name
                 this.currentExperiment.experiment.sequence[name] = this.currentBlock;
             } else {
+                // If the name hasn't changed, just update the block in the sequence object with the existing name
                 this.currentExperiment.experiment.sequence[this.currentBlock.name] = this.currentBlock;
             }
         }
+        console.log("Test", "Final state of current experiment: " + JSON.stringify(this.currentExperiment.experiment, null, 2));
     },
     returnFromPossibilityEditor: function() {
         this.setPossibilityName();
         this.state = 3;
     },
     setPossibilityName: function() {
+        // Generate a possibility name using the friendly name and the block's possibilities order
         var name = this.getBlockName(this.currentPossibility.friendly_name, this.currentBlock.possibilities.order);
+        console.log("Test", "Generated possibility name: " + name);
+
+        // Check if the possibility name is null (hasn't been named yet)
         if (this.currentPossibility.name == null) {
+            // Assign the generated name to the current possibility
             this.currentPossibility.name = name;
+            // Add the possibility to the block's possibilities object using the name as key
             this.currentBlock.possibilities[name] = this.currentPossibility;
-            if (this.currentBlock.possibilities.order == "" ) {
+
+            // If the possibilities order is empty, set the order to the new possibility name
+            if (this.currentBlock.possibilities.order === "") {
                 this.currentBlock.possibilities.order = name;
             } else {
+                // Otherwise, append the new possibility name to the possibilities order
                 this.currentBlock.possibilities.order = this.currentBlock.possibilities.order + "," + name;
             }
-            //this.currentBlock.possibilities.order.splice(this.currentBlock.possibilities.order.length - 2, 0, name);
         } else {
-            if (this.currentBlock.name.substring(0, this.currentBlock.name.lastIndexOf('_')) != name.substring(0, name.lastIndexOf('_'))) {
+            // If the possibility already has a name, check if the base name (before the underscore) has changed
+            var oldNameBase = this.currentPossibility.name.substring(0, this.currentPossibility.name.lastIndexOf('_'));
+            var newNameBase = name.substring(0, name.lastIndexOf('_'));
+
+            if (oldNameBase !== newNameBase) {
+                // Remove the old possibility name from the possibilities object
+                console.log("Test", "Replacing possibility: " + this.currentPossibility.name + " with: " + name);
                 delete this.currentBlock.possibilities[this.currentPossibility.name];
+                // Replace the old possibility name with the new name in the possibilities order
                 this.currentBlock.possibilities.order = this.currentBlock.possibilities.order.replace(this.currentPossibility.name, name);
+                // Set the new possibility name
                 this.currentPossibility.name = name;
+                // Add the possibility to the possibilities object under the new name
                 this.currentBlock.possibilities[name] = this.currentPossibility;
             } else {
+                // If the name hasn't changed, just update the possibility in the possibilities object with the existing name
                 this.currentBlock.possibilities[this.currentPossibility.name] = this.currentPossibility;
             }
         }
+        console.log("Test", "Final state of current block: " + JSON.stringify(this.currentBlock, null, 2));
     },
     editButtonClick: async function(block) {
         if (block != "+" && block != "Save & Exit") {
-            this.currentBlock = this.currentExperiment.experiment.sequence[block];
+            this.currentBlock = JSON.parse(JSON.stringify(this.currentExperiment.experiment.sequence[block]));
             this.currentBlock.name = block;
             this.state = 3;
         } else if (block == "+") {
@@ -350,6 +387,7 @@ var vm = new Vue({
                     order: ""
                 }
             };
+            console.log("Created new block with empty possibilities");
             this.state = 3;
         } else if (block == "Save & Exit") {
             var dataResponse = await fetch("/experiment?name=" + this.currentExperiment.name, {
@@ -388,10 +426,10 @@ var vm = new Vue({
             });
             // Update the UI to remove the experiment from the list
             this.experiments = this.experiments.filter(experiment => experiment !== experimentName);
-            alert(`Experiment "${experimentName}" has been deleted.`);
+            console.log("Test",`Experiment "${experimentName}" has been deleted.`);
           } catch (error) {
             console.error('Error deleting experiment:', error);
-            alert(`Error deleting experiment "${experimentName}".`);
+            console.log("Test",`Error deleting experiment "${experimentName}".`);
           }
         }
     },
@@ -430,23 +468,37 @@ var vm = new Vue({
             "Point At": "point_at_",
             "Empty": "empty_"
         };
-        var name = nameMapping[friendly_name] || "empty_";
-        var counter = 0;
 
-        if (typeof order === 'string' && order.trim() !== "") {
-            orderArray = order.split(",").map(item => item.trim()); // Split and trim to handle extra spaces
-        } else if (Array.isArray(order)) {
-            orderArray = order; // Direct assignment if already an array
+        // If friendly_name is invalid, log and return early
+        if (!friendly_name || !nameMapping[friendly_name]) {
+            console.log("Test: Invalid friendly_name", friendly_name);
+            friendly_name = "Empty"; // Default to "Empty" to avoid errors, but you can handle this differently
         }
 
+        var name = nameMapping[friendly_name];
+        var counter = 0;
+        var orderArray = [];
+
+        if (typeof order === "string") {
+            if (order.trim() !== "") {
+                orderArray = order.split(",").map(item => item.trim()); // Split and trim to handle extra spaces
+            }
+        } else if (Array.isArray(order)) {
+            orderArray = order; // Direct assignment if already an array
+        } else {
+            console.log("Test: Invalid order type:", (typeof order));
+        }
+
+        // Loop through existing blocks and update counter for naming
         orderArray.forEach(block => {
             if (block.startsWith(name)) {
-                var suffixNumber = parseInt(block.substring(name.length), 10); // Correctly parse the number suffix
+                var suffixNumber = parseInt(block.substring(name.length), 10); // Parse the number suffix
                 if (!isNaN(suffixNumber) && suffixNumber >= counter) {
                     counter = suffixNumber + 1;
                 }
             }
         });
+
         var countedName = name + counter;
         return countedName;
     }
